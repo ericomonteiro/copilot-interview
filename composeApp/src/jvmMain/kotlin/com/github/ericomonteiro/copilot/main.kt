@@ -29,6 +29,9 @@ fun main() = application {
     // State for stealth mode (will be loaded from database)
     var stealthModeEnabled by remember { mutableStateOf(true) }
     
+    // State for screenshot trigger (increment to trigger)
+    var screenshotTrigger by remember { mutableStateOf(0) }
+    
     // Coroutine scope for async operations
     val coroutineScope = rememberCoroutineScope()
     
@@ -48,12 +51,11 @@ fun main() = application {
         resizable = true,
         alwaysOnTop = true,
         onKeyEvent = { keyEvent ->
-            // Handle Cmd+B (or Ctrl+B on Windows) to toggle stealth mode
             if (keyEvent.type == KeyEventType.KeyDown) {
                 val isModifierPressed = keyEvent.isMetaPressed || keyEvent.isCtrlPressed
-                val isBKey = keyEvent.key == Key.B
                 
-                if (isModifierPressed && isBKey) {
+                // Handle Cmd+B (or Ctrl+B on Windows) to toggle stealth mode
+                if (isModifierPressed && keyEvent.key == Key.B) {
                     // Toggle stealth mode
                     stealthModeEnabled = !stealthModeEnabled
                     windowManager.setHideFromCapture(stealthModeEnabled)
@@ -65,6 +67,13 @@ fun main() = application {
                     }
                     
                     println("⌨️ Hotkey: Stealth mode ${if (stealthModeEnabled) "ENABLED" else "DISABLED"} (Cmd+B)")
+                    return@Window true // Event consumed
+                }
+                
+                // Handle Cmd+Shift+S (or Ctrl+Shift+S on Windows) to capture screenshot
+                if (isModifierPressed && keyEvent.isShiftPressed && keyEvent.key == Key.S) {
+                    screenshotTrigger++
+                    println("⌨️ Hotkey: Screenshot capture triggered (Cmd+Shift+S)")
                     return@Window true // Event consumed
                 }
             }
@@ -96,7 +105,9 @@ fun main() = application {
                 stealthModeEnabled = hideFromCapture // Update state
                 windowManager.setHideFromCapture(hideFromCapture)
                 println("WindowManager: Initial stealth mode loaded: ${if (hideFromCapture) "ENABLED" else "DISABLED"}")
-                println("WindowManager: Press Cmd+B (or Ctrl+B) to toggle stealth mode")
+                println("WindowManager: Keyboard shortcuts:")
+                println("  • Cmd+B (or Ctrl+B) - Toggle stealth mode")
+                println("  • Cmd+Shift+S (or Ctrl+Shift+S) - Capture screenshot & analyze")
             } else {
                 println("WindowManager: ERROR - AWT window not found after $attempts attempts")
             }
@@ -115,7 +126,8 @@ fun main() = application {
             onHideFromCaptureChanged = { hide ->
                 windowManager.setHideFromCapture(hide)
                 println("Stealth mode ${if (hide) "enabled" else "disabled"}")
-            }
+            },
+            screenshotTrigger = screenshotTrigger
         )
     }
 }

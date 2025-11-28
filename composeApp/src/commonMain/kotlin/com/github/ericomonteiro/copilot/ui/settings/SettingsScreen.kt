@@ -213,6 +213,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "• Use Ctrl/Cmd+B to toggle window visibility\n" +
+                    "• Use Ctrl/Cmd+Shift+S to capture screenshot & analyze\n" +
                     "• Solutions are cached after first generation\n" +
                     "• Gemini is completely FREE (no credit card needed)",
                     style = MaterialTheme.typography.bodySmall

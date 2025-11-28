@@ -4,12 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.github.ericomonteiro.copilot.screenshot.captureScreenshot
 import com.github.ericomonteiro.copilot.ui.search.SearchScreen
 import com.github.ericomonteiro.copilot.ui.solution.SolutionScreen
 import com.github.ericomonteiro.copilot.ui.settings.SettingsScreen
 import com.github.ericomonteiro.copilot.ui.screenshot.ScreenshotAnalysisScreen
-import kotlinx.coroutines.launch
 
 enum class Screen {
     SEARCH, SOLUTION, SETTINGS, SCREENSHOT_ANALYSIS
@@ -17,12 +15,20 @@ enum class Screen {
 
 @Composable
 fun App(
-    onHideFromCaptureChanged: (Boolean) -> Unit = {}
+    onHideFromCaptureChanged: (Boolean) -> Unit = {},
+    screenshotTrigger: Int = 0
 ) {
     var currentScreen by remember { mutableStateOf(Screen.SEARCH) }
     var selectedProblemId by remember { mutableStateOf<Long?>(null) }
-    var screenshotBase64 by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
+    var autoCapture by remember { mutableStateOf(false) }
+    
+    // Handle screenshot request from keyboard shortcut
+    LaunchedEffect(screenshotTrigger) {
+        if (screenshotTrigger > 0) {
+            autoCapture = true
+            currentScreen = Screen.SCREENSHOT_ANALYSIS
+        }
+    }
     
     MaterialTheme(
         colorScheme = darkColorScheme()
@@ -41,17 +47,7 @@ fun App(
                         currentScreen = Screen.SETTINGS
                     },
                     onScreenshotClick = {
-                        scope.launch {
-                            captureScreenshot().fold(
-                                onSuccess = { base64 ->
-                                    screenshotBase64 = base64
-                                    currentScreen = Screen.SCREENSHOT_ANALYSIS
-                                },
-                                onFailure = { error ->
-                                    println("Failed to capture screenshot: ${error.message}")
-                                }
-                            )
-                        }
+                        currentScreen = Screen.SCREENSHOT_ANALYSIS
                     }
                 )
                 Screen.SOLUTION -> SolutionScreen(
@@ -69,14 +65,13 @@ fun App(
                     }
                 )
                 Screen.SCREENSHOT_ANALYSIS -> {
-                    screenshotBase64?.let { base64 ->
-                        ScreenshotAnalysisScreen(
-                            screenshotBase64 = base64,
-                            onBackClick = {
-                                currentScreen = Screen.SEARCH
-                            }
-                        )
-                    }
+                    ScreenshotAnalysisScreen(
+                        autoCapture = autoCapture,
+                        onBackClick = {
+                            autoCapture = false
+                            currentScreen = Screen.SEARCH
+                        }
+                    )
                 }
             }
         }

@@ -41,9 +41,7 @@ val appModule = module {
         SolutionViewModel(problemId, get(), get())
     }
     factory { SettingsViewModel(get()) }
-    factory { (screenshotBase64: String) ->
-        ScreenshotAnalysisViewModel(get(), screenshotBase64)
-    }
+    factory { ScreenshotAnalysisViewModel(get()) }
 }
 
 // Platform-specific database creation
