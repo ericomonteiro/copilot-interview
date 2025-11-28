@@ -2,12 +2,6 @@
 
 AI-powered desktop application that helps you solve coding challenges using Google Gemini AI with vision capabilities.
 
-## 📽️ Demo
-
-https://github.com/user-attachments/assets/copilot-demo.mov
-
-<video src="misc/copilot-demo.mov" controls width="800"></video>
-
 ## 🚀 Features
 
 - **Screenshot Analysis**: Capture coding challenges from your screen and get instant solutions
