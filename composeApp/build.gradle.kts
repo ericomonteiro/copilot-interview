@@ -80,8 +80,10 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.github.ericomonteiro.copilot"
+            packageName = "interview-copilot"
             packageVersion = "1.0.0"
+            
+            modules("java.sql")
         }
     }
 }

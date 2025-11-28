@@ -76,7 +76,7 @@ Output: `composeApp/build/compose/binaries/main/dmg/`
 ### Windows MSI
 
 ```bash
-.\gradlew.bat :composeApp:packageMsi
+./gradlew :composeApp:packageMsi
 ```
 
 Output: `composeApp\build\compose\binaries\main\msi\`
