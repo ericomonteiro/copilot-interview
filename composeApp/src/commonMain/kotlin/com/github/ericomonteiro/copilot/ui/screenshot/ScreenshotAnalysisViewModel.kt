@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.ericomonteiro.copilot.ai.AIService
 import com.github.ericomonteiro.copilot.ai.SolutionResponse
+import com.github.ericomonteiro.copilot.data.repository.SettingsRepository
 import com.github.ericomonteiro.copilot.screenshot.captureScreenshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,11 +21,23 @@ data class ScreenshotAnalysisState(
 )
 
 class ScreenshotAnalysisViewModel(
-    private val aiService: AIService
+    private val aiService: AIService,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(ScreenshotAnalysisState())
     val state: StateFlow<ScreenshotAnalysisState> = _state.asStateFlow()
+    
+    init {
+        loadDefaultLanguage()
+    }
+    
+    private fun loadDefaultLanguage() {
+        viewModelScope.launch {
+            val defaultLanguage = settingsRepository.getSetting("default_language") ?: "Kotlin"
+            _state.value = _state.value.copy(selectedLanguage = defaultLanguage)
+        }
+    }
     
     fun selectLanguage(language: String) {
         _state.value = _state.value.copy(selectedLanguage = language)

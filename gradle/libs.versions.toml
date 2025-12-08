@@ -14,6 +14,7 @@ koin-compose = "1.1.2"
 jna = "5.14.0"
 java-objc-bridge = "1.1"
 compose-code-editor = "3.1.1"
+jnativehook = "2.2.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -37,6 +38,7 @@ jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 java-objc-bridge = { module = "ca.weblite:java-objc-bridge", version.ref = "java-objc-bridge" }
 compose-code-editor = { module = "com.github.Qawaz.compose-code-editor:codeeditor", version.ref = "compose-code-editor" }
+jnativehook = { module = "com.github.kwhat:jnativehook", version.ref = "jnativehook" }
 
 [plugins]
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }

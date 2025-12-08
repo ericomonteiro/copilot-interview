@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.copilot.ai.SolutionResponse
 import com.github.ericomonteiro.copilot.ui.components.CodeDisplay
+import com.github.ericomonteiro.copilot.ui.settings.AVAILABLE_LANGUAGES
 import org.koin.compose.koinInject
 
 @Composable
 fun ScreenshotAnalysisScreen(
     autoCapture: Boolean = false,
-    onBackClick: () -> Unit
+    onSettingsClick: () -> Unit = {},
+    onAutoCaptureConsumed: () -> Unit = {}
 ) {
     val viewModel: ScreenshotAnalysisViewModel = koinInject()
     val state by viewModel.state.collectAsState()
@@ -28,6 +30,7 @@ fun ScreenshotAnalysisScreen(
     LaunchedEffect(autoCapture) {
         if (autoCapture && state.screenshotBase64 == null && !state.isCapturing) {
             viewModel.captureAndAnalyze()
+            onAutoCaptureConsumed()
         }
     }
     
@@ -40,14 +43,10 @@ fun ScreenshotAnalysisScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.ArrowBack, "Back")
-            }
-            
             Text(
-                text = "Screenshot Analysis",
+                text = "Challenge Solver",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                modifier = Modifier.weight(1f)
             )
             
             // Recapture button (shown when there's a screenshot)
@@ -71,7 +70,7 @@ fun ScreenshotAnalysisScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    listOf("Kotlin", "Java", "Python", "JavaScript", "C++", "Go", "Rust").forEach { lang ->
+                    AVAILABLE_LANGUAGES.forEach { lang ->
                         DropdownMenuItem(
                             text = { Text(lang) },
                             onClick = {
@@ -81,6 +80,11 @@ fun ScreenshotAnalysisScreen(
                         )
                     }
                 }
+            }
+            
+            // Settings button
+            IconButton(onClick = onSettingsClick) {
+                Icon(Icons.Default.Settings, "Settings")
             }
         }
         
@@ -207,11 +211,48 @@ fun SolutionContent(solution: SolutionResponse, language: String = "Kotlin") {
 
 @Composable
 fun CodeTab(code: String, language: String = "Kotlin") {
-    CodeDisplay(
-        code = code,
-        language = language,
-        showLineNumbers = true
-    )
+    var copied by remember { mutableStateOf(false) }
+    
+    // Auto-copy to clipboard when code is displayed
+    LaunchedEffect(code) {
+        copyToClipboard(code)
+        copied = true
+        kotlinx.coroutines.delay(3000)
+        copied = false
+    }
+    
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (copied) {
+                Text(
+                    "✓ Copied to clipboard!",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            Button(
+                onClick = { 
+                    copyToClipboard(code)
+                    copied = true
+                }
+            ) {
+                Text("Copy Code")
+            }
+        }
+        
+        CodeDisplay(
+            code = code,
+            language = language,
+            showLineNumbers = true
+        )
+    }
 }
 
 @Composable

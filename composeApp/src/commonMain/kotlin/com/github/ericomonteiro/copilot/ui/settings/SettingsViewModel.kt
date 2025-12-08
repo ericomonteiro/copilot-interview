@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.ericomonteiro.copilot.ai.GeminiService
 import com.github.ericomonteiro.copilot.ai.HttpClientFactory
-import com.github.ericomonteiro.copilot.data.repository.ProblemRepository
+import com.github.ericomonteiro.copilot.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val repository: ProblemRepository
+    private val repository: SettingsRepository
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(SettingsState())
@@ -24,12 +24,14 @@ class SettingsViewModel(
             val apiKey = repository.getSetting("api_key") ?: ""
             val hideFromCapture = repository.getSetting("hide_from_capture")?.toBoolean() ?: true
             val selectedModel = repository.getSetting("selected_model") ?: "gemini-2.5-flash"
+            val defaultLanguage = repository.getSetting("default_language") ?: "Kotlin"
             
             _state.update {
                 it.copy(
                     apiKey = apiKey,
                     hideFromCapture = hideFromCapture,
-                    selectedModel = selectedModel
+                    selectedModel = selectedModel,
+                    defaultLanguage = defaultLanguage
                 )
             }
         }
@@ -54,6 +56,13 @@ class SettingsViewModel(
         _state.update { it.copy(selectedModel = modelId) }
         viewModelScope.launch {
             repository.setSetting("selected_model", modelId)
+        }
+    }
+    
+    fun setDefaultLanguage(language: String) {
+        _state.update { it.copy(defaultLanguage = language) }
+        viewModelScope.launch {
+            repository.setSetting("default_language", language)
         }
     }
     
@@ -169,7 +178,13 @@ data class SettingsState(
     val testResult: String? = null,
     val selectedModel: String = "gemini-2.5-flash",
     val availableModels: List<GeminiModel> = getDefaultModels(),
-    val isLoadingModels: Boolean = false
+    val isLoadingModels: Boolean = false,
+    val defaultLanguage: String = "Kotlin"
+)
+
+val AVAILABLE_LANGUAGES = listOf(
+    "Kotlin", "Java", "Python", "JavaScript", "C++", "Go", "Rust",
+    "MySQL", "DB2", "Oracle", "MS SQL Server"
 )
 
 data class GeminiModel(

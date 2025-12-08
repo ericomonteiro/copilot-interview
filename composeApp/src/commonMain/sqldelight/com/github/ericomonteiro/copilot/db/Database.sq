@@ -1,31 +1,3 @@
--- Problem table
-CREATE TABLE Problem (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    platform TEXT NOT NULL,
-    problem_name TEXT NOT NULL,
-    problem_number INTEGER,
-    difficulty TEXT NOT NULL,
-    description TEXT NOT NULL,
-    created_at INTEGER NOT NULL
-);
-
-CREATE INDEX idx_problem_name ON Problem(problem_name);
-CREATE INDEX idx_problem_platform ON Problem(platform);
-
--- Solution table
-CREATE TABLE Solution (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    problem_id INTEGER NOT NULL,
-    language TEXT NOT NULL,
-    code TEXT NOT NULL,
-    explanation TEXT NOT NULL,
-    time_complexity TEXT NOT NULL,
-    space_complexity TEXT NOT NULL,
-    FOREIGN KEY (problem_id) REFERENCES Problem(id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_solution_problem ON Solution(problem_id);
-
 -- App settings table
 CREATE TABLE AppSettings (
     key TEXT PRIMARY KEY,
@@ -33,31 +5,6 @@ CREATE TABLE AppSettings (
 );
 
 -- Queries
-selectAllProblems:
-SELECT * FROM Problem ORDER BY problem_name ASC;
-
-searchProblems:
-SELECT * FROM Problem 
-WHERE problem_name LIKE '%' || ? || '%'
-ORDER BY problem_name ASC
-LIMIT 50;
-
-selectProblemById:
-SELECT * FROM Problem WHERE id = ?;
-
-selectSolutionByProblemAndLanguage:
-SELECT * FROM Solution 
-WHERE problem_id = ? AND language = ?
-LIMIT 1;
-
-insertProblem:
-INSERT INTO Problem(platform, problem_name, problem_number, difficulty, description, created_at)
-VALUES (?, ?, ?, ?, ?, ?);
-
-insertSolution:
-INSERT INTO Solution(problem_id, language, code, explanation, time_complexity, space_complexity)
-VALUES (?, ?, ?, ?, ?, ?);
-
 getSetting:
 SELECT value FROM AppSettings WHERE key = ?;
 

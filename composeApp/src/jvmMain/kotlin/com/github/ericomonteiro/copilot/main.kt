@@ -1,17 +1,18 @@
 package com.github.ericomonteiro.copilot
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.github.ericomonteiro.copilot.data.repository.ProblemRepository
-import com.github.ericomonteiro.copilot.data.seedDatabase
+import com.github.ericomonteiro.copilot.data.repository.SettingsRepository
 import com.github.ericomonteiro.copilot.di.appModule
+import com.github.ericomonteiro.copilot.hotkey.GlobalHotkeyManager
 import com.github.ericomonteiro.copilot.platform.WindowManager
 import com.github.ericomonteiro.copilot.ui.App
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.get
@@ -26,14 +27,45 @@ fun main() = application {
     // Create WindowManager for native window operations
     val windowManager = WindowManager()
     
+    // Global coroutine scope
+    val globalScope = remember { CoroutineScope(Dispatchers.Default) }
+    
     // State for stealth mode (will be loaded from database)
     var stealthModeEnabled by remember { mutableStateOf(true) }
     
     // State for screenshot trigger (increment to trigger)
     var screenshotTrigger by remember { mutableStateOf(0) }
     
-    // Coroutine scope for async operations
-    val coroutineScope = rememberCoroutineScope()
+    // Global hotkey manager for all shortcuts
+    val globalHotkeyManager = remember {
+        GlobalHotkeyManager(
+            onScreenshotHotkey = {
+                screenshotTrigger++
+            },
+            onStealthHotkey = {
+                stealthModeEnabled = !stealthModeEnabled
+                windowManager.setHideFromCapture(stealthModeEnabled)
+                println("⌨️ Stealth mode ${if (stealthModeEnabled) "ENABLED" else "DISABLED"}")
+                // Save to database
+                val repository = get<SettingsRepository>(SettingsRepository::class.java)
+                globalScope.launch {
+                    repository.setSetting("hide_from_capture", stealthModeEnabled.toString())
+                }
+            }
+        )
+    }
+    
+    // Register global hotkeys on startup
+    LaunchedEffect(Unit) {
+        globalHotkeyManager.register()
+    }
+    
+    // Cleanup on exit
+    DisposableEffect(Unit) {
+        onDispose {
+            globalHotkeyManager.unregister()
+        }
+    }
     
     // Window state for dragging
     val windowState = rememberWindowState(
@@ -49,36 +81,7 @@ fun main() = application {
         undecorated = false,
         transparent = false,
         resizable = true,
-        alwaysOnTop = true,
-        onKeyEvent = { keyEvent ->
-            if (keyEvent.type == KeyEventType.KeyDown) {
-                val isModifierPressed = keyEvent.isMetaPressed || keyEvent.isCtrlPressed
-                
-                // Handle Cmd+B (or Ctrl+B on Windows) to toggle stealth mode
-                if (isModifierPressed && keyEvent.key == Key.B) {
-                    // Toggle stealth mode
-                    stealthModeEnabled = !stealthModeEnabled
-                    windowManager.setHideFromCapture(stealthModeEnabled)
-                    
-                    // Save to database
-                    val repository = get<ProblemRepository>(ProblemRepository::class.java)
-                    coroutineScope.launch {
-                        repository.setSetting("hide_from_capture", stealthModeEnabled.toString())
-                    }
-                    
-                    println("⌨️ Hotkey: Stealth mode ${if (stealthModeEnabled) "ENABLED" else "DISABLED"} (Cmd+B)")
-                    return@Window true // Event consumed
-                }
-                
-                // Handle Cmd+Shift+S (or Ctrl+Shift+S on Windows) to capture screenshot
-                if (isModifierPressed && keyEvent.isShiftPressed && keyEvent.key == Key.S) {
-                    screenshotTrigger++
-                    println("⌨️ Hotkey: Screenshot capture triggered (Cmd+Shift+S)")
-                    return@Window true // Event consumed
-                }
-            }
-            false // Event not consumed
-        }
+        alwaysOnTop = true
     ) {
         // Initialize WindowManager with the AWT window
         LaunchedEffect(Unit) {
@@ -98,27 +101,15 @@ fun main() = application {
                 println("WindowManager: AWT window set successfully (attempt ${attempts + 1})")
                 
                 // Load and apply initial settings from database
-                val repository = get<ProblemRepository>(ProblemRepository::class.java)
+                val repository = get<SettingsRepository>(SettingsRepository::class.java)
                 
                 // Load stealth mode setting (default: true/enabled)
                 val hideFromCapture = repository.getSetting("hide_from_capture")?.toBoolean() ?: true
                 stealthModeEnabled = hideFromCapture // Update state
                 windowManager.setHideFromCapture(hideFromCapture)
                 println("WindowManager: Initial stealth mode loaded: ${if (hideFromCapture) "ENABLED" else "DISABLED"}")
-                println("WindowManager: Keyboard shortcuts:")
-                println("  • Cmd+B (or Ctrl+B) - Toggle stealth mode")
-                println("  • Cmd+Shift+S (or Ctrl+Shift+S) - Capture screenshot & analyze")
             } else {
                 println("WindowManager: ERROR - AWT window not found after $attempts attempts")
-            }
-        }
-        
-        // Seed database on first run
-        LaunchedEffect(Unit) {
-            val repository = get<ProblemRepository>(ProblemRepository::class.java)
-            val problems = repository.getAllProblems()
-            if (problems.isEmpty()) {
-                seedDatabase(repository)
             }
         }
         

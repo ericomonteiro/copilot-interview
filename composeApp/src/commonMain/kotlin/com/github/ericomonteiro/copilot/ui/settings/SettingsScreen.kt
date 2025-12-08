@@ -136,6 +136,48 @@ fun SettingsScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
+        // Default Language Selection
+        Text("Default Language", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        var languageExpanded by remember { mutableStateOf(false) }
+        Box {
+            OutlinedButton(
+                onClick = { languageExpanded = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(state.defaultLanguage)
+                    Icon(Icons.Default.ArrowDropDown, null)
+                }
+            }
+            DropdownMenu(
+                expanded = languageExpanded,
+                onDismissRequest = { languageExpanded = false }
+            ) {
+                AVAILABLE_LANGUAGES.forEach { lang ->
+                    DropdownMenuItem(
+                        text = { Text(lang) },
+                        onClick = {
+                            viewModel.setDefaultLanguage(lang)
+                            languageExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Text(
+            "This language will be pre-selected when analyzing challenges",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
         // Stealth Mode
         Text("Stealth Features", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
@@ -212,9 +254,10 @@ fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "• Use Ctrl/Cmd+B to toggle window visibility\n" +
-                    "• Use Ctrl/Cmd+Shift+S to capture screenshot & analyze\n" +
-                    "• Solutions are cached after first generation\n" +
+                    "Global Hotkeys (work even when app is not focused):\n" +
+                    "• Cmd+Shift+Opt+S - Capture screenshot & analyze\n" +
+                    "• Cmd+Shift+Opt+B - Toggle stealth mode\n\n" +
+                    "• Solution code is auto-copied to clipboard!\n" +
                     "• Gemini is completely FREE (no credit card needed)",
                     style = MaterialTheme.typography.bodySmall
                 )

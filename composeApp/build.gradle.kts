@@ -11,6 +11,8 @@ plugins {
 
 kotlin {
     jvm()
+    
+    jvmToolchain(21)
 
     sourceSets {
         commonMain.dependencies {
@@ -61,6 +63,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.clientCio)
             implementation(libs.sqldelight.driver)
+            implementation(libs.jnativehook)
         }
     }
 }
