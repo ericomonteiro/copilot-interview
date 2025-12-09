@@ -5,12 +5,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.github.ericomonteiro.copilot.ui.certification.CertificationAnalysisScreen
+import com.github.ericomonteiro.copilot.ui.exam.GenericExamScreen
 import com.github.ericomonteiro.copilot.ui.history.ScreenshotHistoryScreen
+import com.github.ericomonteiro.copilot.ui.home.HomeScreen
 import com.github.ericomonteiro.copilot.ui.settings.SettingsScreen
 import com.github.ericomonteiro.copilot.ui.screenshot.ScreenshotAnalysisScreen
 
 enum class Screen {
-    SCREENSHOT_ANALYSIS, CERTIFICATION_ANALYSIS, SETTINGS, HISTORY
+    HOME, SCREENSHOT_ANALYSIS, CERTIFICATION_ANALYSIS, GENERIC_EXAM, SETTINGS, HISTORY
 }
 
 @Composable
@@ -18,7 +20,7 @@ fun App(
     onHideFromCaptureChanged: (Boolean) -> Unit = {},
     screenshotTrigger: Int = 0
 ) {
-    var currentScreen by remember { mutableStateOf(Screen.SCREENSHOT_ANALYSIS) }
+    var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var autoCapture by remember { mutableStateOf(false) }
     
     // Handle screenshot request from keyboard shortcut - respects current screen context
@@ -26,8 +28,8 @@ fun App(
         if (screenshotTrigger > 0) {
             autoCapture = true
             // Don't change screen - trigger capture in current context (code or certification)
-            // If on settings or history, go to the last active screen (default to screenshot analysis)
-            if (currentScreen == Screen.SETTINGS || currentScreen == Screen.HISTORY) {
+            // If on home, settings or history, go to screenshot analysis
+            if (currentScreen == Screen.HOME || currentScreen == Screen.SETTINGS || currentScreen == Screen.HISTORY) {
                 currentScreen = Screen.SCREENSHOT_ANALYSIS
             }
         }
@@ -41,6 +43,20 @@ fun App(
             color = MaterialTheme.colorScheme.background
         ) {
             when (currentScreen) {
+                Screen.HOME -> HomeScreen(
+                    onCodeChallengeClick = {
+                        currentScreen = Screen.SCREENSHOT_ANALYSIS
+                    },
+                    onCertificationClick = {
+                        currentScreen = Screen.CERTIFICATION_ANALYSIS
+                    },
+                    onGenericExamClick = {
+                        currentScreen = Screen.GENERIC_EXAM
+                    },
+                    onSettingsClick = {
+                        currentScreen = Screen.SETTINGS
+                    }
+                )
                 Screen.SCREENSHOT_ANALYSIS -> {
                     ScreenshotAnalysisScreen(
                         autoCapture = autoCapture,
@@ -49,6 +65,9 @@ fun App(
                         },
                         onCertificationClick = {
                             currentScreen = Screen.CERTIFICATION_ANALYSIS
+                        },
+                        onHomeClick = {
+                            currentScreen = Screen.HOME
                         },
                         onAutoCaptureConsumed = {
                             autoCapture = false
@@ -64,6 +83,23 @@ fun App(
                         onCodeChallengeClick = {
                             currentScreen = Screen.SCREENSHOT_ANALYSIS
                         },
+                        onHomeClick = {
+                            currentScreen = Screen.HOME
+                        },
+                        onAutoCaptureConsumed = {
+                            autoCapture = false
+                        }
+                    )
+                }
+                Screen.GENERIC_EXAM -> {
+                    GenericExamScreen(
+                        autoCapture = autoCapture,
+                        onSettingsClick = {
+                            currentScreen = Screen.SETTINGS
+                        },
+                        onHomeClick = {
+                            currentScreen = Screen.HOME
+                        },
                         onAutoCaptureConsumed = {
                             autoCapture = false
                         }
@@ -71,7 +107,7 @@ fun App(
                 }
                 Screen.SETTINGS -> SettingsScreen(
                     onCloseClick = {
-                        currentScreen = Screen.SCREENSHOT_ANALYSIS
+                        currentScreen = Screen.HOME
                     },
                     onHideFromCaptureChanged = { hide ->
                         onHideFromCaptureChanged(hide)

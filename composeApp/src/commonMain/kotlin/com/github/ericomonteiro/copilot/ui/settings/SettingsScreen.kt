@@ -2,6 +2,7 @@ package com.github.ericomonteiro.copilot.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -11,7 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 
@@ -23,6 +29,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinInject()
 ) {
     val state by viewModel.state.collectAsState()
+    val uriHandler = LocalUriHandler.current
     
     // Update hide from capture in parent when it changes
     LaunchedEffect(state.hideFromCapture) {
@@ -62,11 +69,30 @@ fun SettingsScreen(
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true
         )
-        Text(
-            "Get your API key from https://makersuite.google.com/app/apikey",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp)
+        val apiKeyUrl = "https://aistudio.google.com/app/apikey"
+        val apiKeyAnnotatedString = buildAnnotatedString {
+            append("Get your API key from ")
+            pushStringAnnotation(tag = "URL", annotation = apiKeyUrl)
+            withStyle(style = SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )) {
+                append("Google AI Studio")
+            }
+            pop()
+        }
+        ClickableText(
+            text = apiKeyAnnotatedString,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier.padding(top = 4.dp),
+            onClick = { offset ->
+                apiKeyAnnotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                    .firstOrNull()?.let { annotation ->
+                        uriHandler.openUri(annotation.item)
+                    }
+            }
         )
         
         Spacer(modifier = Modifier.height(24.dp))

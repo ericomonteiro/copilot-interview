@@ -8,7 +8,8 @@ import kotlinx.coroutines.withContext
 
 enum class ScreenshotType {
     CODE_CHALLENGE,
-    CERTIFICATION
+    CERTIFICATION,
+    GENERIC_EXAM
 }
 
 class ScreenshotHistoryRepository(private val database: Database) {

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +25,7 @@ fun CertificationAnalysisScreen(
     autoCapture: Boolean = false,
     onSettingsClick: () -> Unit = {},
     onCodeChallengeClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
     onAutoCaptureConsumed: () -> Unit = {}
 ) {
     val viewModel: CertificationAnalysisViewModel = koinInject()
@@ -95,6 +97,11 @@ fun CertificationAnalysisScreen(
             // Code Challenge button
             IconButton(onClick = onCodeChallengeClick) {
                 Icon(Icons.Default.Code, "Code Challenges")
+            }
+            
+            // Home button
+            IconButton(onClick = onHomeClick) {
+                Icon(Icons.Default.Home, "Home")
             }
             
             // Settings button

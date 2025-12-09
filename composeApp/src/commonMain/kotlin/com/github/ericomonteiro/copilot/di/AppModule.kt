@@ -7,6 +7,7 @@ import com.github.ericomonteiro.copilot.data.repository.ScreenshotHistoryReposit
 import com.github.ericomonteiro.copilot.data.repository.SettingsRepository
 import com.github.ericomonteiro.copilot.db.Database
 import com.github.ericomonteiro.copilot.ui.certification.CertificationAnalysisViewModel
+import com.github.ericomonteiro.copilot.ui.exam.GenericExamViewModel
 import com.github.ericomonteiro.copilot.ui.history.ScreenshotHistoryViewModel
 import com.github.ericomonteiro.copilot.ui.settings.SettingsViewModel
 import com.github.ericomonteiro.copilot.ui.screenshot.ScreenshotAnalysisViewModel
@@ -35,6 +36,7 @@ val appModule = module {
     factory { SettingsViewModel(get()) }
     factory { ScreenshotAnalysisViewModel(get(), get(), get()) }
     factory { CertificationAnalysisViewModel(get(), get(), get()) }
+    factory { GenericExamViewModel(get(), get(), get()) }
     factory { ScreenshotHistoryViewModel(get()) }
 }
 
