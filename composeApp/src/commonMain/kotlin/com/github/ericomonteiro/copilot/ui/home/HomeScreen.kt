@@ -1,17 +1,23 @@
 package com.github.ericomonteiro.copilot.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.ericomonteiro.copilot.ui.theme.AppColors
 
 @Composable
 fun HomeScreen(
@@ -34,17 +40,16 @@ fun HomeScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Psychology,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                Text(
+                    "🦜",
+                    style = MaterialTheme.typography.headlineMedium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Interview Assistant",
+                    "Pirate-Parrot",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.Primary
                 )
             }
             
@@ -74,44 +79,61 @@ fun HomeScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
-            Icon(
-                imageVector = Icons.Default.Psychology,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                "Interview Assistant",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            
-            Text(
-                "Your AI-powered coding companion",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Header with gradient background
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                AppColors.Primary.copy(alpha = 0.2f),
+                                AppColors.Secondary.copy(alpha = 0.15f),
+                                AppColors.Tertiary.copy(alpha = 0.1f)
+                            )
+                        )
+                    )
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "🦜",
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        "Pirate-Parrot",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.Primary
+                    )
+                    
+                    Text(
+                        "Your AI-powered study companion",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.height(32.dp))
             
             // What is section
             SectionCard(
-                icon = Icons.Default.Info,
-                title = "What is Interview Assistant?",
+                icon = Icons.Outlined.Info,
+                title = "What is Pirate-Parrot?",
                 content = """
-                    Interview Assistant is a desktop application designed to help you during coding interviews and AWS certification exams.
+                    Pirate-Parrot is a desktop application designed to help you during coding interviews and certification exams.
                     
                     It captures your screen, analyzes the content using Google's Gemini AI, and provides:
                     
                     • Code solutions with explanations for coding challenges
                     • Correct answers with detailed explanations for certification questions
                     • Time and space complexity analysis
-                    • Exam tips and related AWS services
+                    • Exam tips and related services
                     
                     The app runs in "stealth mode" - it's invisible to screen sharing and recording software.
                 """.trimIndent()
@@ -121,7 +143,7 @@ fun HomeScreen(
             
             // Configuration section
             SectionCard(
-                icon = Icons.Default.Settings,
+                icon = Icons.Outlined.Settings,
                 title = "What You Need to Configure",
                 content = """
                     Before using the app, you need to set up:
@@ -157,7 +179,7 @@ fun HomeScreen(
             
             // How to use section
             SectionCard(
-                icon = Icons.Default.PlayArrow,
+                icon = Icons.Outlined.PlayArrow,
                 title = "How to Use",
                 content = """
                     The app has two main modes:
@@ -200,25 +222,28 @@ fun HomeScreen(
             ) {
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Default.Code,
+                    icon = Icons.Outlined.Code,
                     title = "Code Challenge",
                     description = "Solve coding problems",
+                    gradientColors = listOf(AppColors.Primary, AppColors.PrimaryDark),
                     onClick = onCodeChallengeClick
                 )
                 
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Default.School,
+                    icon = Icons.Outlined.School,
                     title = "Certification",
                     description = "AWS exam questions",
+                    gradientColors = listOf(AppColors.Secondary, AppColors.SecondaryDark),
                     onClick = onCertificationClick
                 )
                 
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Default.Quiz,
+                    icon = Icons.Outlined.Quiz,
                     title = "Generic Exam",
                     description = "ENEM, Vestibular, Concursos",
+                    gradientColors = listOf(AppColors.Tertiary, AppColors.TertiaryDark),
                     onClick = onGenericExamClick
                 )
             }
@@ -237,18 +262,27 @@ private fun SectionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(AppColors.Primary.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = AppColors.Primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     title,
@@ -279,42 +313,65 @@ private fun QuickActionCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     description: String,
+    gradientColors: List<androidx.compose.ui.graphics.Color> = listOf(AppColors.Primary, AppColors.PrimaryDark),
     onClick: () -> Unit
 ) {
     Card(
         modifier = modifier,
         onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = androidx.compose.ui.graphics.Color.Transparent
         )
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        colors = gradientColors.map { it.copy(alpha = 0.3f) }
+                    )
+                )
+                .padding(24.dp)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            
-            Text(
-                description,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(gradientColors.first().copy(alpha = 0.3f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = gradientColors.first()
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

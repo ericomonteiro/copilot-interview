@@ -1,23 +1,25 @@
 package com.github.ericomonteiro.copilot.ui.certification
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.copilot.ai.CertificationQuestionAnswer
 import com.github.ericomonteiro.copilot.ai.CertificationResponse
 import com.github.ericomonteiro.copilot.ai.CertificationType
+import com.github.ericomonteiro.copilot.ui.theme.AppColors
 import org.koin.compose.koinInject
 
 @Composable
@@ -47,66 +49,81 @@ fun CertificationAnalysisScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "AWS Certification Assistant",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
-            
-            if (state.screenshotBase64 != null) {
-                IconButton(
-                    onClick = { viewModel.captureAndAnalyze() },
-                    enabled = !state.isCapturing && !state.isLoading
-                ) {
-                    Icon(Icons.Default.CameraAlt, "Recapture Screenshot")
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "🦜",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Certification",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.Secondary
+                )
             }
             
-            // Certification selector
-            var expanded by remember { mutableStateOf(false) }
-            Box {
-                TextButton(onClick = { expanded = true }) {
-                    Text(state.selectedCertification.displayName.replace("AWS ", ""))
-                    Icon(Icons.Default.ArrowDropDown, null)
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    CertificationType.entries.forEach { cert ->
-                        DropdownMenuItem(
-                            text = { 
-                                Column {
-                                    Text(cert.displayName)
-                                    Text(
-                                        cert.description,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            },
-                            onClick = {
-                                viewModel.selectCertification(cert)
-                                expanded = false
-                            }
-                        )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (state.screenshotBase64 != null) {
+                    FilledTonalIconButton(
+                        onClick = { viewModel.captureAndAnalyze() },
+                        enabled = !state.isCapturing && !state.isLoading
+                    ) {
+                        Icon(Icons.Outlined.CameraAlt, "Recapture Screenshot")
                     }
                 }
-            }
-            
-            // Code Challenge button
-            IconButton(onClick = onCodeChallengeClick) {
-                Icon(Icons.Default.Code, "Code Challenges")
-            }
-            
-            // Home button
-            IconButton(onClick = onHomeClick) {
-                Icon(Icons.Default.Home, "Home")
-            }
-            
-            // Settings button
-            IconButton(onClick = onSettingsClick) {
-                Icon(Icons.Default.Settings, "Settings")
+                
+                // Certification selector
+                var expanded by remember { mutableStateOf(false) }
+                Box {
+                    FilledTonalButton(
+                        onClick = { expanded = true },
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(state.selectedCertification.displayName.replace("AWS ", ""))
+                        Icon(Icons.Default.ArrowDropDown, null)
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        CertificationType.entries.forEach { cert ->
+                            DropdownMenuItem(
+                                text = { 
+                                    Column {
+                                        Text(cert.displayName)
+                                        Text(
+                                            cert.description,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    viewModel.selectCertification(cert)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                // Code Challenge button
+                IconButton(onClick = onCodeChallengeClick) {
+                    Icon(Icons.Outlined.Code, "Code Challenges")
+                }
+                
+                // Home button
+                IconButton(onClick = onHomeClick) {
+                    Icon(Icons.Outlined.Home, "Home")
+                }
+                
+                // Settings button
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Outlined.Settings, "Settings")
+                }
             }
         }
         
@@ -120,25 +137,64 @@ fun CertificationAnalysisScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(32.dp)
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            AppColors.Secondary.copy(alpha = 0.3f),
+                                            AppColors.Secondary.copy(alpha = 0.1f)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Outlined.School,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = AppColors.Secondary
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
                         Text(
-                            "AWS Certification Helper",
+                            "Certification Helper",
                             style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "Capture a screenshot of your certification exam question to get the correct answer with detailed explanations.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 32.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        
+                        Spacer(modifier = Modifier.height(32.dp))
+                        
                         Button(
                             onClick = { viewModel.captureAndAnalyze() },
-                            modifier = Modifier.size(width = 200.dp, height = 56.dp)
+                            modifier = Modifier.height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.Secondary
+                            )
                         ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = null)
+                            Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Capture & Analyze")
+                            Text("Capture & Analyze", fontWeight = FontWeight.Bold)
                         }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            "Shortcut: Cmd+Shift+Opt+S",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

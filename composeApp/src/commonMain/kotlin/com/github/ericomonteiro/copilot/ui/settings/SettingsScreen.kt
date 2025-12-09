@@ -1,24 +1,28 @@
 package com.github.ericomonteiro.copilot.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.github.ericomonteiro.copilot.ui.theme.AppColors
 import org.koin.compose.koinInject
 
 @Composable
@@ -47,19 +51,27 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                "Settings",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            IconButton(onClick = onCloseClick) {
-                Icon(Icons.Default.Close, "Close")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "🦜",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Settings",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            FilledTonalIconButton(onClick = onCloseClick) {
+                Icon(Icons.Outlined.Close, "Close")
             }
         }
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // API Key
-        Text("Gemini API Key", style = MaterialTheme.typography.titleMedium)
+        // API Key Section
+        SettingsSectionHeader(icon = Icons.Outlined.Key, title = "Gemini API Key")
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = state.apiKey,
@@ -67,7 +79,8 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("sk-...") },
             visualTransformation = PasswordVisualTransformation(),
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp)
         )
         val apiKeyUrl = "https://aistudio.google.com/app/apikey"
         val apiKeyAnnotatedString = buildAnnotatedString {
@@ -103,9 +116,14 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("AI Model", style = MaterialTheme.typography.titleMedium)
-            TextButton(onClick = { viewModel.loadAvailableModels() }) {
-                Text("Reload Models")
+            SettingsSectionHeader(icon = Icons.Outlined.SmartToy, title = "AI Model")
+            FilledTonalButton(
+                onClick = { viewModel.loadAvailableModels() },
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Reload")
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -165,7 +183,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Default Language Selection
-        Text("Default Language", style = MaterialTheme.typography.titleMedium)
+        SettingsSectionHeader(icon = Icons.Outlined.Language, title = "Default Language")
         Spacer(modifier = Modifier.height(8.dp))
         var languageExpanded by remember { mutableStateOf(false) }
         Box {
@@ -207,7 +225,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Stealth Mode
-        Text("Stealth Features", style = MaterialTheme.typography.titleMedium)
+        SettingsSectionHeader(icon = Icons.Outlined.VisibilityOff, title = "Stealth Features")
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -231,13 +249,14 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Troubleshooting
-        Text("Troubleshooting", style = MaterialTheme.typography.titleMedium)
+        SettingsSectionHeader(icon = Icons.Outlined.BugReport, title = "Troubleshooting")
         Spacer(modifier = Modifier.height(8.dp))
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onHistoryClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Icon(Icons.Default.History, contentDescription = null)
+            Icon(Icons.Outlined.History, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Screenshot History")
         }
@@ -253,9 +272,15 @@ fun SettingsScreen(
         // Test API Button
         Button(
             onClick = { viewModel.testApiConnection() },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AppColors.Primary
+            )
         ) {
-            Text("Test API Connection & List Models")
+            Icon(Icons.Outlined.NetworkCheck, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Test API Connection", fontWeight = FontWeight.Bold)
         }
         
         // Show test result
@@ -291,15 +316,26 @@ fun SettingsScreen(
         // Info
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = AppColors.Primary.copy(alpha = 0.1f)
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    "Tips",
-                    style = MaterialTheme.typography.titleSmall
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Outlined.Lightbulb,
+                        contentDescription = null,
+                        tint = AppColors.Primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Tips",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.Primary
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "Global Hotkeys (work even when app is not focused):\n" +
@@ -311,6 +347,35 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SettingsSectionHeader(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AppColors.Primary.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = AppColors.Primary,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

@@ -1,19 +1,25 @@
 package com.github.ericomonteiro.copilot.ui.exam
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.copilot.ai.GenericExamQuestionAnswer
 import com.github.ericomonteiro.copilot.ai.GenericExamResponse
 import com.github.ericomonteiro.copilot.ai.GenericExamType
+import com.github.ericomonteiro.copilot.ui.theme.AppColors
 import org.koin.compose.koinInject
 
 @Composable
@@ -42,26 +48,29 @@ fun GenericExamScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Exam Assistant",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "🦜",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Generic Exam",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.Tertiary
+                )
+            }
             
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Exam type selector
                 var expanded by remember { mutableStateOf(false) }
                 Box {
-                    OutlinedButton(
+                    FilledTonalButton(
                         onClick = { expanded = true },
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Column {
-                            Text(
-                                state.selectedExamType.displayName,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        Text(state.selectedExamType.displayName)
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(Icons.Default.ArrowDropDown, null, modifier = Modifier.size(20.dp))
                     }
@@ -94,12 +103,12 @@ fun GenericExamScreen(
                 
                 // Home button
                 IconButton(onClick = onHomeClick) {
-                    Icon(Icons.Default.Home, "Home")
+                    Icon(Icons.Outlined.Home, "Home")
                 }
                 
                 // Settings button
                 IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.Settings, "Settings")
+                    Icon(Icons.Outlined.Settings, "Settings")
                 }
             }
         }
@@ -130,16 +139,34 @@ fun GenericExamScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(32.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Quiz,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            AppColors.Tertiary.copy(alpha = 0.3f),
+                                            AppColors.Tertiary.copy(alpha = 0.1f)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Outlined.Quiz,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = AppColors.Tertiary
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
                         Text(
                             "Capture Exam Question",
-                            style = MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -147,16 +174,24 @@ fun GenericExamScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Spacer(modifier = Modifier.height(32.dp))
+                        
                         Button(
                             onClick = { viewModel.captureAndAnalyze() },
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.Tertiary
+                            )
                         ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = null)
+                            Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Capture Screenshot")
+                            Text("Capture Screenshot", fontWeight = FontWeight.Bold)
                         }
+                        
                         Spacer(modifier = Modifier.height(16.dp))
+                        
                         Text(
                             "Shortcut: Cmd+Shift+Opt+S",
                             style = MaterialTheme.typography.bodySmall,
@@ -249,13 +284,45 @@ private fun ExamAnswerContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Recapture button
+        // Header with language badge and recapture button
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedButton(onClick = onRecapture) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null)
+            // Language Badge
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = AppColors.Secondary.copy(alpha = 0.2f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Outlined.Language,
+                        contentDescription = null,
+                        tint = AppColors.Secondary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        response.detectedLanguage,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.Secondary
+                    )
+                }
+            }
+            
+            // Recapture button
+            FilledTonalButton(
+                onClick = onRecapture,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("New Capture")
             }

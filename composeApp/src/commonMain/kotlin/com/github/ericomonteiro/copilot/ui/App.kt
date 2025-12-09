@@ -10,6 +10,7 @@ import com.github.ericomonteiro.copilot.ui.history.ScreenshotHistoryScreen
 import com.github.ericomonteiro.copilot.ui.home.HomeScreen
 import com.github.ericomonteiro.copilot.ui.settings.SettingsScreen
 import com.github.ericomonteiro.copilot.ui.screenshot.ScreenshotAnalysisScreen
+import com.github.ericomonteiro.copilot.ui.theme.PirateParrotDarkColorScheme
 
 enum class Screen {
     HOME, SCREENSHOT_ANALYSIS, CERTIFICATION_ANALYSIS, GENERIC_EXAM, SETTINGS, HISTORY
@@ -36,7 +37,7 @@ fun App(
     }
     
     MaterialTheme(
-        colorScheme = darkColorScheme()
+        colorScheme = PirateParrotDarkColorScheme
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),

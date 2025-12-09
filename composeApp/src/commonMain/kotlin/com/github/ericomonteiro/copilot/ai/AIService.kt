@@ -89,7 +89,8 @@ data class GenericExamQuestionAnswer(
 @Serializable
 data class GenericExamResponse(
     val answers: List<GenericExamQuestionAnswer>,
-    val studyTips: String
+    val studyTips: String,
+    val detectedLanguage: String = "Unknown"
 )
 
 @Serializable
@@ -417,6 +418,7 @@ class GeminiService(
             
             Provide your response in JSON format:
             {
+              "detectedLanguage": "The language detected in the exam (e.g., Portuguese, English, Spanish)",
               "answers": [
                 {
                   "questionNumber": 1,

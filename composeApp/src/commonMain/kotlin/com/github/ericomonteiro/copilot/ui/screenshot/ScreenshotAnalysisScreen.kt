@@ -1,22 +1,25 @@
 package com.github.ericomonteiro.copilot.ui.screenshot
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.copilot.ai.SolutionResponse
 import com.github.ericomonteiro.copilot.ui.components.CodeDisplay
 import com.github.ericomonteiro.copilot.ui.settings.AVAILABLE_LANGUAGES
+import com.github.ericomonteiro.copilot.ui.theme.AppColors
 import org.koin.compose.koinInject
 
 @Composable
@@ -47,58 +50,73 @@ fun ScreenshotAnalysisScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Challenge Solver",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
-            
-            // Recapture button (shown when there's a screenshot)
-            if (state.screenshotBase64 != null) {
-                IconButton(
-                    onClick = { viewModel.captureAndAnalyze() },
-                    enabled = !state.isCapturing && !state.isLoading
-                ) {
-                    Icon(Icons.Default.CameraAlt, "Recapture Screenshot")
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "🦜",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Code Challenge",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.Primary
+                )
             }
             
-            // Language selector
-            var expanded by remember { mutableStateOf(false) }
-            Box {
-                TextButton(onClick = { expanded = true }) {
-                    Text(state.selectedLanguage)
-                    Icon(Icons.Default.ArrowDropDown, null)
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    AVAILABLE_LANGUAGES.forEach { lang ->
-                        DropdownMenuItem(
-                            text = { Text(lang) },
-                            onClick = {
-                                viewModel.selectLanguage(lang)
-                                expanded = false
-                            }
-                        )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Recapture button (shown when there's a screenshot)
+                if (state.screenshotBase64 != null) {
+                    FilledTonalIconButton(
+                        onClick = { viewModel.captureAndAnalyze() },
+                        enabled = !state.isCapturing && !state.isLoading
+                    ) {
+                        Icon(Icons.Outlined.CameraAlt, "Recapture Screenshot")
                     }
                 }
-            }
-            
-            // Certification button
-            IconButton(onClick = onCertificationClick) {
-                Icon(Icons.Default.School, "AWS Certification")
-            }
-            
-            // Home button
-            IconButton(onClick = onHomeClick) {
-                Icon(Icons.Default.Home, "Home")
-            }
-            
-            // Settings button
-            IconButton(onClick = onSettingsClick) {
-                Icon(Icons.Default.Settings, "Settings")
+                
+                // Language selector
+                var expanded by remember { mutableStateOf(false) }
+                Box {
+                    FilledTonalButton(
+                        onClick = { expanded = true },
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(state.selectedLanguage)
+                        Icon(Icons.Default.ArrowDropDown, null)
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        AVAILABLE_LANGUAGES.forEach { lang ->
+                            DropdownMenuItem(
+                                text = { Text(lang) },
+                                onClick = {
+                                    viewModel.selectLanguage(lang)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                // Certification button
+                IconButton(onClick = onCertificationClick) {
+                    Icon(Icons.Outlined.School, "AWS Certification")
+                }
+                
+                // Home button
+                IconButton(onClick = onHomeClick) {
+                    Icon(Icons.Outlined.Home, "Home")
+                }
+                
+                // Settings button
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Outlined.Settings, "Settings")
+                }
             }
         }
         
@@ -113,25 +131,64 @@ fun ScreenshotAnalysisScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.padding(32.dp)
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            AppColors.Primary.copy(alpha = 0.3f),
+                                            AppColors.Primary.copy(alpha = 0.1f)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Outlined.Code,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = AppColors.Primary
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
                         Text(
                             "Capture Screenshot",
                             style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "Click the button below to capture your screen and analyze the coding challenge.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 32.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        
+                        Spacer(modifier = Modifier.height(32.dp))
+                        
                         Button(
                             onClick = { viewModel.captureAndAnalyze() },
-                            modifier = Modifier.size(width = 200.dp, height = 56.dp)
+                            modifier = Modifier.height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.Primary
+                            )
                         ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = null)
+                            Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Capture & Analyze")
+                            Text("Capture & Analyze", fontWeight = FontWeight.Bold)
                         }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            "Shortcut: Cmd+Shift+Opt+S",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

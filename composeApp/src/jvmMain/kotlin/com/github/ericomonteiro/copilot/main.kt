@@ -124,7 +124,7 @@ fun main() {
         
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Interview Assistant",
+            title = "Pirate-Parrot",
             state = windowState,
             undecorated = false,
             transparent = false,
