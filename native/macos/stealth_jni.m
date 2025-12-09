@@ -8,7 +8,7 @@
  */
 
 JNIEXPORT void JNICALL 
-Java_com_github_ericomonteiro_copilot_platform_WindowManager_nativeSetHideFromCapture
+Java_com_github_ericomonteiro_pirateparrotai_platform_WindowManager_nativeSetHideFromCapture
   (JNIEnv *env, jobject obj, jboolean hide) {
     
     // Execute on main thread (required for Cocoa UI operations)

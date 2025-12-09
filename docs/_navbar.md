@@ -1,0 +1,6 @@
+- [Home](/)
+- [Getting Started](getting-started/)
+- [Features](features/)
+- [Architecture](architecture/)
+- [API](api/ai-service.md)
+- [:octocat: GitHub](https://github.com/ericomonteiro/copilot)

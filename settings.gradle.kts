@@ -1,4 +1,4 @@
-rootProject.name = "copilot"
+rootProject.name = "pirate-parrot-ai"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

@@ -49,10 +49,9 @@ kotlin {
             // Code Editor
             implementation(libs.compose.code.editor)
             
-            // Native
+            // Native (JNA for cross-platform native access)
             implementation(libs.jna)
             implementation(libs.jna.platform)
-            implementation(libs.java.objc.bridge)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -71,22 +70,36 @@ kotlin {
 sqldelight {
     databases {
         create("Database") {
-            packageName.set("com.github.ericomonteiro.copilot.db")
+            packageName.set("com.github.ericomonteiro.pirateparrotai.db")
         }
     }
 }
 
 
+kotlin {
+    jvm {
+        mainRun {
+            mainClass.set("com.github.ericomonteiro.pirateparrotai.MainKt")
+        }
+    }
+}
+
 compose.desktop {
     application {
-        mainClass = "com.github.ericomonteiro.copilot.MainKt"
+        mainClass = "com.github.ericomonteiro.pirateparrotai.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "interview-copilot"
+            packageName = "pirate-parrot"
             packageVersion = "1.0.0"
             
             modules("java.sql")
+            
+            windows {
+                menuGroup = "Pirate-Parrot"
+                perUserInstall = true
+                shortcut = true
+            }
         }
     }
 }
