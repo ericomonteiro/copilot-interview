@@ -48,10 +48,29 @@ private val savedWindowState: WindowSavedState by lazy {
 }
 
 fun main() {
-    // Initialize Koin and load window state before application starts
-    koinApp
-    val initialWindowState = savedWindowState
+    // Set up global exception handler for uncaught exceptions
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+        AppLogger.error("Uncaught exception in thread ${thread.name}: ${throwable.message}", throwable)
+    }
     
+    try {
+        AppLogger.info("Application starting...")
+        
+        // Initialize Koin and load window state before application starts
+        koinApp
+        AppLogger.info("Koin initialized")
+        
+        val initialWindowState = savedWindowState
+        AppLogger.info("Window state loaded: ${initialWindowState.width}x${initialWindowState.height}")
+        
+        startApplication(initialWindowState)
+    } catch (e: Exception) {
+        AppLogger.error("Fatal error during startup: ${e.message}", e)
+        throw e
+    }
+}
+
+private fun startApplication(initialWindowState: WindowSavedState) {
     application {
         // Create WindowManager for native window operations
         val windowManager = WindowManager()

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#1a1a2e"/>
+  
+  <!-- Parrot body -->
+  <ellipse cx="256" cy="300" rx="120" ry="140" fill="#2ecc71"/>
+  
+  <!-- Parrot head -->
+  <circle cx="256" cy="180" r="90" fill="#27ae60"/>
+  
+  <!-- Eye patch strap -->
+  <path d="M 170 160 Q 256 130 342 160" stroke="#2c3e50" stroke-width="8" fill="none"/>
+  
+  <!-- Eye patch -->
+  <ellipse cx="200" cy="170" rx="35" ry="30" fill="#2c3e50"/>
+  
+  <!-- Good eye -->
+  <circle cx="310" cy="170" r="25" fill="white"/>
+  <circle cx="315" cy="170" r="12" fill="#2c3e50"/>
+  <circle cx="318" cy="167" r="4" fill="white"/>
+  
+  <!-- Beak -->
+  <path d="M 230 210 Q 256 200 280 210 L 256 270 Z" fill="#f39c12"/>
+  <path d="M 230 210 Q 256 220 280 210" stroke="#e67e22" stroke-width="3" fill="none"/>
+  
+  <!-- Pirate hat -->
+  <path d="M 140 140 Q 160 60 256 50 Q 352 60 372 140 L 340 150 Q 256 130 172 150 Z" fill="#2c3e50"/>
+  <path d="M 172 150 Q 256 170 340 150" stroke="#2c3e50" stroke-width="8" fill="none"/>
+  
+  <!-- Skull on hat -->
+  <circle cx="256" cy="100" r="20" fill="white"/>
+  <circle cx="248" cy="95" r="5" fill="#2c3e50"/>
+  <circle cx="264" cy="95" r="5" fill="#2c3e50"/>
+  <ellipse cx="256" cy="108" rx="6" ry="4" fill="#2c3e50"/>
+  
+  <!-- Crossbones -->
+  <path d="M 230 115 L 282 85" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 230 85 L 282 115" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Wing -->
+  <ellipse cx="180" cy="320" rx="50" ry="80" fill="#229954"/>
+  
+  <!-- Tail feathers -->
+  <path d="M 256 420 L 220 480 L 256 460 L 292 480 Z" fill="#e74c3c"/>
+  <path d="M 256 420 L 200 470 L 240 450" fill="#f1c40f"/>
+  <path d="M 256 420 L 312 470 L 272 450" fill="#3498db"/>
+  
+  <!-- Feet -->
+  <path d="M 220 430 L 200 470 M 200 470 L 185 480 M 200 470 L 200 485 M 200 470 L 215 480" stroke="#f39c12" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 292 430 L 312 470 M 312 470 L 297 480 M 312 470 L 312 485 M 312 470 L 327 480" stroke="#f39c12" stroke-width="6" stroke-linecap="round"/>
+</svg>

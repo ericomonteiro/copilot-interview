@@ -91,10 +91,20 @@ compose.desktop {
             
             modules("java.sql")
             
+            // App icons
             windows {
                 menuGroup = "Pirate-Parrot"
                 perUserInstall = true
                 shortcut = true
+                iconFile.set(project.file("src/jvmMain/resources/icon.ico"))
+            }
+            
+            macOS {
+                iconFile.set(project.file("src/jvmMain/resources/icon-mac.png"))
+            }
+            
+            linux {
+                iconFile.set(project.file("src/jvmMain/resources/icon.png"))
             }
         }
     }
