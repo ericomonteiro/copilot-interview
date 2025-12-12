@@ -100,7 +100,7 @@ compose.desktop {
             }
             
             macOS {
-                iconFile.set(project.file("src/jvmMain/resources/icon-mac.png"))
+                iconFile.set(project.file("src/jvmMain/resources/icon-mac.icns"))
             }
             
             linux {

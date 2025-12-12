@@ -11,12 +11,22 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.encodeToString
 
 interface AIService {
@@ -42,6 +52,35 @@ interface AIService {
     ): Result<GenericExamResponse>
 }
 
+/**
+ * Custom serializer that handles both String and Object formats for incorrectAnswersExplanation.
+ * Gemini 2.5 Pro sometimes returns this as an object like {"A": "...", "B": "..."} instead of a string.
+ */
+object FlexibleStringSerializer : KSerializer<String> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("FlexibleString", PrimitiveKind.STRING)
+    
+    override fun serialize(encoder: Encoder, value: String) {
+        encoder.encodeString(value)
+    }
+    
+    override fun deserialize(decoder: Decoder): String {
+        val jsonDecoder = decoder as? JsonDecoder
+            ?: return decoder.decodeString()
+        
+        return when (val element = jsonDecoder.decodeJsonElement()) {
+            is JsonPrimitive -> element.content
+            is JsonObject -> {
+                // Convert object format {"A": "explanation", "B": "explanation"} to readable string
+                element.entries.joinToString("\n\n") { (key, value) ->
+                    val explanation = (value as? JsonPrimitive)?.content ?: value.toString()
+                    "$key: $explanation"
+                }
+            }
+            else -> element.toString()
+        }
+    }
+}
+
 enum class CertificationType(val displayName: String, val description: String) {
     AWS_CLOUD_PRACTITIONER("AWS Cloud Practitioner", "Foundational AWS certification"),
     AWS_SOLUTIONS_ARCHITECT_ASSOCIATE("AWS Solutions Architect Associate", "Associate-level architecture certification"),
@@ -57,6 +96,7 @@ data class CertificationQuestionAnswer(
     val questionSummary: String,
     val correctAnswer: String,
     val explanation: String,
+    @Serializable(with = FlexibleStringSerializer::class)
     val incorrectAnswersExplanation: String,
     val relatedServices: List<String>
 )
@@ -82,6 +122,7 @@ data class GenericExamQuestionAnswer(
     val questionSummary: String,
     val correctAnswer: String,
     val explanation: String,
+    @Serializable(with = FlexibleStringSerializer::class)
     val incorrectAnswersExplanation: String,
     val subject: String,
     val topic: String

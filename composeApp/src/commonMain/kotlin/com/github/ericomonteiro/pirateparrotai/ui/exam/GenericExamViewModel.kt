@@ -9,6 +9,7 @@ import com.github.ericomonteiro.pirateparrotai.data.repository.ScreenshotHistory
 import com.github.ericomonteiro.pirateparrotai.data.repository.ScreenshotType
 import com.github.ericomonteiro.pirateparrotai.data.repository.SettingsRepository
 import com.github.ericomonteiro.pirateparrotai.screenshot.captureScreenshot
+import com.github.ericomonteiro.pirateparrotai.screenshot.ScreenshotCaptureConfig
 import com.github.ericomonteiro.pirateparrotai.util.AppLogger
 import com.github.ericomonteiro.pirateparrotai.util.JsonUtils
 import com.github.ericomonteiro.pirateparrotai.util.SettingsKeys
@@ -76,7 +77,9 @@ class GenericExamViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(isCapturing = true, error = null)
             
-            captureScreenshot().fold(
+            // Use configured capture region if available
+            val region = ScreenshotCaptureConfig.captureRegion
+            captureScreenshot(region).fold(
                 onSuccess = { base64 ->
                     _state.value = _state.value.copy(
                         screenshotBase64 = base64,
@@ -124,7 +127,17 @@ class GenericExamViewModel(
                     saveToHistory(screenshot, response, null)
                 },
                 onFailure = { exception ->
-                    val errorMsg = exception.message ?: "Unknown error occurred"
+                    val errorMsg = buildString {
+                        append(exception::class.simpleName ?: "Error")
+                        append(": ")
+                        append(exception.message ?: "Unknown error occurred")
+                        exception.cause?.let { cause ->
+                            append("\n\nCaused by: ")
+                            append(cause::class.simpleName)
+                            append(": ")
+                            append(cause.message)
+                        }
+                    }
                     _state.value = _state.value.copy(
                         isLoading = false,
                         error = errorMsg

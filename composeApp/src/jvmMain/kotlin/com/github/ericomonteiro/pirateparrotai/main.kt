@@ -11,6 +11,7 @@ import com.github.ericomonteiro.pirateparrotai.data.repository.SettingsRepositor
 import com.github.ericomonteiro.pirateparrotai.di.appModule
 import com.github.ericomonteiro.pirateparrotai.hotkey.GlobalHotkeyManager
 import com.github.ericomonteiro.pirateparrotai.platform.WindowManager
+import com.github.ericomonteiro.pirateparrotai.screenshot.CaptureRegion
 import com.github.ericomonteiro.pirateparrotai.screenshot.ScreenshotCaptureConfig
 import com.github.ericomonteiro.pirateparrotai.ui.App
 import com.github.ericomonteiro.pirateparrotai.util.AppLogger
@@ -178,6 +179,19 @@ private fun startApplication(initialWindowState: WindowSavedState) {
                     ScreenshotCaptureConfig.wasStealthEnabled = hideFromCapture
                     windowManager.setHideFromCapture(hideFromCapture)
                     AppLogger.info("WindowManager: Initial stealth mode: ${if (hideFromCapture) "ENABLED" else "DISABLED"}")
+                    
+                    // Load capture region settings
+                    val captureRegionEnabled = repo.getSetting(SettingsKeys.CAPTURE_REGION_ENABLED)?.toBoolean() ?: false
+                    if (captureRegionEnabled) {
+                        val x = repo.getSetting(SettingsKeys.CAPTURE_REGION_X)?.toIntOrNull() ?: 0
+                        val y = repo.getSetting(SettingsKeys.CAPTURE_REGION_Y)?.toIntOrNull() ?: 0
+                        val width = repo.getSetting(SettingsKeys.CAPTURE_REGION_WIDTH)?.toIntOrNull() ?: 0
+                        val height = repo.getSetting(SettingsKeys.CAPTURE_REGION_HEIGHT)?.toIntOrNull() ?: 0
+                        if (width > 0 && height > 0) {
+                            ScreenshotCaptureConfig.captureRegion = CaptureRegion(x, y, width, height)
+                            AppLogger.info("WindowManager: Capture region loaded: ${width}x${height} at ($x, $y)")
+                        }
+                    }
                 } else {
                     AppLogger.error("WindowManager: AWT window not found after $attempts attempts")
                 }

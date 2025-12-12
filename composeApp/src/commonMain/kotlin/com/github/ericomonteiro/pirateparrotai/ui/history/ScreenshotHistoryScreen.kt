@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -323,6 +324,7 @@ fun ScreenshotDetailView(screenshot: ScreenshotHistory) {
         
         // Error section
         screenshot.error?.let { error ->
+            var isErrorExpanded by remember { mutableStateOf(false) }
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -330,18 +332,56 @@ fun ScreenshotDetailView(screenshot: ScreenshotHistory) {
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "⚠ Error",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "⚠ Error",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Row {
+                            IconButton(
+                                onClick = { isErrorExpanded = !isErrorExpanded }
+                            ) {
+                                Icon(
+                                    if (isErrorExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                    contentDescription = if (isErrorExpanded) "Collapse" else "Expand",
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                            IconButton(
+                                onClick = { copyToClipboard(error) }
+                            ) {
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = "Copy error",
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        error,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                    SelectionContainer {
+                        Text(
+                            error,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            maxLines = if (isErrorExpanded) Int.MAX_VALUE else 10,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (!isErrorExpanded && error.length > 500) {
+                        Text(
+                            "Click expand to see full error (${error.length} characters)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -349,6 +389,7 @@ fun ScreenshotDetailView(screenshot: ScreenshotHistory) {
         
         // Analysis result
         screenshot.analysisResult?.let { result ->
+            var isResultExpanded by remember { mutableStateOf(false) }
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -356,18 +397,42 @@ fun ScreenshotDetailView(screenshot: ScreenshotHistory) {
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "✓ Analysis Result",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "✓ Analysis Result",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        IconButton(
+                            onClick = { isResultExpanded = !isResultExpanded }
+                        ) {
+                            Icon(
+                                if (isResultExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                contentDescription = if (isResultExpanded) "Collapse" else "Expand"
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        result,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 50,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    SelectionContainer {
+                        Text(
+                            result,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = if (isResultExpanded) Int.MAX_VALUE else 20,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (!isResultExpanded && result.length > 1000) {
+                        Text(
+                            "Click expand to see full result (${result.length} characters)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
         }

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.github.ericomonteiro.pirateparrotai.screenshot.CaptureRegion
 import com.github.ericomonteiro.pirateparrotai.ui.theme.AppColors
 import com.github.ericomonteiro.pirateparrotai.util.ClipboardUtils
 import org.koin.compose.koinInject
@@ -31,6 +32,7 @@ fun SettingsScreen(
     onCloseClick: () -> Unit,
     onHideFromCaptureChanged: (Boolean) -> Unit = {},
     onHistoryClick: () -> Unit = {},
+    onSelectCaptureRegion: () -> Unit = {},
     viewModel: SettingsViewModel = koinInject()
 ) {
     val state by viewModel.state.collectAsState()
@@ -246,6 +248,77 @@ fun SettingsScreen(
                 onCheckedChange = { viewModel.setHideFromCapture(it) }
             )
         }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Capture Region Section
+        SettingsSectionHeader(icon = Icons.Outlined.Crop, title = "Capture Region")
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Use Custom Region")
+                Text(
+                    if (state.captureRegionEnabled && state.captureRegion != null) {
+                        "Region: ${state.captureRegion!!.width} x ${state.captureRegion!!.height} at (${state.captureRegion!!.x}, ${state.captureRegion!!.y})"
+                    } else {
+                        "Capture entire screen"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = state.captureRegionEnabled,
+                onCheckedChange = { enabled ->
+                    if (enabled && state.captureRegion == null) {
+                        onSelectCaptureRegion()
+                    } else {
+                        viewModel.setCaptureRegionEnabled(enabled)
+                    }
+                }
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilledTonalButton(
+                onClick = onSelectCaptureRegion,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Outlined.SelectAll, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Select Region")
+            }
+            
+            if (state.captureRegionEnabled) {
+                OutlinedButton(
+                    onClick = { viewModel.clearCaptureRegion() },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Outlined.Clear, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Clear")
+                }
+            }
+        }
+        
+        Text(
+            "Define a specific screen area to capture instead of the entire screen",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
         
         Spacer(modifier = Modifier.height(24.dp))
         

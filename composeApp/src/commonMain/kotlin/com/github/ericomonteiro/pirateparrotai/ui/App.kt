@@ -9,8 +9,12 @@ import com.github.ericomonteiro.pirateparrotai.ui.exam.GenericExamScreen
 import com.github.ericomonteiro.pirateparrotai.ui.history.ScreenshotHistoryScreen
 import com.github.ericomonteiro.pirateparrotai.ui.home.HomeScreen
 import com.github.ericomonteiro.pirateparrotai.ui.settings.SettingsScreen
+import com.github.ericomonteiro.pirateparrotai.ui.settings.SettingsViewModel
 import com.github.ericomonteiro.pirateparrotai.ui.screenshot.ScreenshotAnalysisScreen
 import com.github.ericomonteiro.pirateparrotai.ui.theme.PirateParrotDarkColorScheme
+import com.github.ericomonteiro.pirateparrotai.screenshot.showRegionSelector
+import com.github.ericomonteiro.pirateparrotai.screenshot.ScreenshotCaptureConfig
+import org.koin.compose.koinInject
 
 enum class Screen {
     HOME, SCREENSHOT_ANALYSIS, CERTIFICATION_ANALYSIS, GENERIC_EXAM, SETTINGS, HISTORY
@@ -106,17 +110,30 @@ fun App(
                         }
                     )
                 }
-                Screen.SETTINGS -> SettingsScreen(
-                    onCloseClick = {
-                        currentScreen = Screen.HOME
-                    },
-                    onHideFromCaptureChanged = { hide ->
-                        onHideFromCaptureChanged(hide)
-                    },
-                    onHistoryClick = {
-                        currentScreen = Screen.HISTORY
-                    }
-                )
+                Screen.SETTINGS -> {
+                    val settingsViewModel: SettingsViewModel = koinInject()
+                    SettingsScreen(
+                        onCloseClick = {
+                            currentScreen = Screen.HOME
+                        },
+                        onHideFromCaptureChanged = { hide ->
+                            onHideFromCaptureChanged(hide)
+                        },
+                        onHistoryClick = {
+                            currentScreen = Screen.HISTORY
+                        },
+                        onSelectCaptureRegion = {
+                            showRegionSelector(
+                                onRegionSelected = { region ->
+                                    settingsViewModel.setCaptureRegion(region)
+                                    ScreenshotCaptureConfig.captureRegion = region
+                                },
+                                onCancelled = {}
+                            )
+                        },
+                        viewModel = settingsViewModel
+                    )
+                }
                 Screen.HISTORY -> ScreenshotHistoryScreen(
                     onBackClick = {
                         currentScreen = Screen.SETTINGS

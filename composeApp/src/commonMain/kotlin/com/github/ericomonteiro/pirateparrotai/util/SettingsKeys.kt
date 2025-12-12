@@ -17,4 +17,11 @@ object SettingsKeys {
     const val WINDOW_HEIGHT = "window_height"
     const val WINDOW_X = "window_x"
     const val WINDOW_Y = "window_y"
+    
+    // Capture region
+    const val CAPTURE_REGION_ENABLED = "capture_region_enabled"
+    const val CAPTURE_REGION_X = "capture_region_x"
+    const val CAPTURE_REGION_Y = "capture_region_y"
+    const val CAPTURE_REGION_WIDTH = "capture_region_width"
+    const val CAPTURE_REGION_HEIGHT = "capture_region_height"
 }

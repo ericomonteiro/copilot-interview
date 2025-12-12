@@ -118,10 +118,21 @@ object SettingsKeys {
     const val SELECTED_MODEL = "selected_model"
     const val DEFAULT_LANGUAGE = "default_language"
     const val HIDE_FROM_CAPTURE = "hide_from_capture"
+    const val DEFAULT_CERTIFICATION = "default_certification"
+    const val DEFAULT_EXAM_TYPE = "default_exam_type"
+    
+    // Window state
     const val WINDOW_WIDTH = "window_width"
     const val WINDOW_HEIGHT = "window_height"
     const val WINDOW_X = "window_x"
     const val WINDOW_Y = "window_y"
+    
+    // Capture region
+    const val CAPTURE_REGION_ENABLED = "capture_region_enabled"
+    const val CAPTURE_REGION_X = "capture_region_x"
+    const val CAPTURE_REGION_Y = "capture_region_y"
+    const val CAPTURE_REGION_WIDTH = "capture_region_width"
+    const val CAPTURE_REGION_HEIGHT = "capture_region_height"
 }
 ```
 
@@ -133,10 +144,17 @@ object SettingsKeys {
 | `selected_model` | `String` | `gemini-2.5-flash` | AI model to use |
 | `default_language` | `String` | `Kotlin` | Default programming language |
 | `hide_from_capture` | `Boolean` | `true` | Stealth mode enabled |
+| `default_certification` | `String` | `AWS_SOLUTIONS_ARCHITECT_ASSOCIATE` | Default certification type |
+| `default_exam_type` | `String` | `ENEM` | Default generic exam type |
 | `window_width` | `Float` | `800` | Window width in dp |
 | `window_height` | `Float` | `600` | Window height in dp |
 | `window_x` | `Float` | `100` | Window X position |
 | `window_y` | `Float` | `100` | Window Y position |
+| `capture_region_enabled` | `Boolean` | `false` | Use custom capture region |
+| `capture_region_x` | `Int` | `0` | Region X coordinate |
+| `capture_region_y` | `Int` | `0` | Region Y coordinate |
+| `capture_region_width` | `Int` | `0` | Region width in pixels |
+| `capture_region_height` | `Int` | `0` | Region height in pixels |
 
 ---
 
@@ -234,6 +252,38 @@ val savedState = runBlocking {
         ?.toFloatOrNull() ?: 600f
     WindowSavedState(width, height)
 }
+```
+
+### Capture Region Management
+
+```kotlin
+// Save capture region
+fun setCaptureRegion(region: CaptureRegion?) {
+    viewModelScope.launch {
+        if (region != null && region.isValid()) {
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "true")
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_X, region.x.toString())
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_Y, region.y.toString())
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_WIDTH, region.width.toString())
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_HEIGHT, region.height.toString())
+        } else {
+            settingsRepository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "false")
+        }
+    }
+}
+
+// Load capture region
+val captureRegionEnabled = settingsRepository
+    .getSetting(SettingsKeys.CAPTURE_REGION_ENABLED)?.toBoolean() ?: false
+
+val captureRegion = if (captureRegionEnabled) {
+    CaptureRegion(
+        x = settingsRepository.getSetting(SettingsKeys.CAPTURE_REGION_X)?.toIntOrNull() ?: 0,
+        y = settingsRepository.getSetting(SettingsKeys.CAPTURE_REGION_Y)?.toIntOrNull() ?: 0,
+        width = settingsRepository.getSetting(SettingsKeys.CAPTURE_REGION_WIDTH)?.toIntOrNull() ?: 0,
+        height = settingsRepository.getSetting(SettingsKeys.CAPTURE_REGION_HEIGHT)?.toIntOrNull() ?: 0
+    )
+} else null
 ```
 
 ---

@@ -6,6 +6,7 @@ import com.github.ericomonteiro.pirateparrotai.ai.GeminiService
 import com.github.ericomonteiro.pirateparrotai.ai.HttpClientFactory
 import com.github.ericomonteiro.pirateparrotai.data.repository.SettingsRepository
 import com.github.ericomonteiro.pirateparrotai.util.AppLogger
+import com.github.ericomonteiro.pirateparrotai.screenshot.CaptureRegion
 import com.github.ericomonteiro.pirateparrotai.util.SettingsKeys
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -28,12 +29,25 @@ class SettingsViewModel(
             val selectedModel = repository.getSetting(SettingsKeys.SELECTED_MODEL) ?: "gemini-2.5-flash"
             val defaultLanguage = repository.getSetting(SettingsKeys.DEFAULT_LANGUAGE) ?: "Kotlin"
             
+            // Load capture region settings
+            val captureRegionEnabled = repository.getSetting(SettingsKeys.CAPTURE_REGION_ENABLED)?.toBoolean() ?: false
+            val captureRegion = if (captureRegionEnabled) {
+                CaptureRegion(
+                    x = repository.getSetting(SettingsKeys.CAPTURE_REGION_X)?.toIntOrNull() ?: 0,
+                    y = repository.getSetting(SettingsKeys.CAPTURE_REGION_Y)?.toIntOrNull() ?: 0,
+                    width = repository.getSetting(SettingsKeys.CAPTURE_REGION_WIDTH)?.toIntOrNull() ?: 0,
+                    height = repository.getSetting(SettingsKeys.CAPTURE_REGION_HEIGHT)?.toIntOrNull() ?: 0
+                )
+            } else null
+            
             _state.update {
                 it.copy(
                     apiKey = apiKey,
                     hideFromCapture = hideFromCapture,
                     selectedModel = selectedModel,
-                    defaultLanguage = defaultLanguage
+                    defaultLanguage = defaultLanguage,
+                    captureRegionEnabled = captureRegionEnabled,
+                    captureRegion = captureRegion
                 )
             }
         }
@@ -64,6 +78,40 @@ class SettingsViewModel(
         _state.update { it.copy(defaultLanguage = language) }
         viewModelScope.launch {
             repository.setSetting(SettingsKeys.DEFAULT_LANGUAGE, language)
+        }
+    }
+    
+    fun setCaptureRegionEnabled(enabled: Boolean) {
+        _state.update { it.copy(captureRegionEnabled = enabled) }
+        viewModelScope.launch {
+            repository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, enabled.toString())
+        }
+    }
+    
+    fun setCaptureRegion(region: CaptureRegion?) {
+        _state.update { 
+            it.copy(
+                captureRegion = region,
+                captureRegionEnabled = region != null && region.isValid()
+            ) 
+        }
+        viewModelScope.launch {
+            if (region != null && region.isValid()) {
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "true")
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_X, region.x.toString())
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_Y, region.y.toString())
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_WIDTH, region.width.toString())
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_HEIGHT, region.height.toString())
+            } else {
+                repository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "false")
+            }
+        }
+    }
+    
+    fun clearCaptureRegion() {
+        _state.update { it.copy(captureRegion = null, captureRegionEnabled = false) }
+        viewModelScope.launch {
+            repository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "false")
         }
     }
     
@@ -190,7 +238,9 @@ data class SettingsState(
     val selectedModel: String = "gemini-2.5-flash",
     val availableModels: List<GeminiModel> = getDefaultModels(),
     val isLoadingModels: Boolean = false,
-    val defaultLanguage: String = "Kotlin"
+    val defaultLanguage: String = "Kotlin",
+    val captureRegionEnabled: Boolean = false,
+    val captureRegion: CaptureRegion? = null
 )
 
 val AVAILABLE_LANGUAGES = listOf(

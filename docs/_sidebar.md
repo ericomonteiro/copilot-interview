@@ -9,6 +9,7 @@
   - [Code Challenge Mode](features/code-challenge.md)
   - [Certification Mode](features/certification.md)
   - [Generic Exam Mode](features/generic-exam.md)
+  - [Capture Region](features/capture-region.md)
   - [Stealth Mode](features/stealth-mode.md)
   - [Global Hotkeys](features/hotkeys.md)
 

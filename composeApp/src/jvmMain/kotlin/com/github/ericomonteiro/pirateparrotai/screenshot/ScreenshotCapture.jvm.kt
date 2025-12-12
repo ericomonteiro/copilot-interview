@@ -1,6 +1,5 @@
 package com.github.ericomonteiro.pirateparrotai.screenshot
 
-import com.github.ericomonteiro.pirateparrotai.platform.WindowManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -10,15 +9,7 @@ import java.awt.Toolkit
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-/**
- * Singleton to hold reference to WindowManager for screenshot capture
- */
-object ScreenshotCaptureConfig {
-    var windowManager: WindowManager? = null
-    var wasStealthEnabled: Boolean = false
-}
-
-actual suspend fun captureScreenshot(): Result<String> = withContext(Dispatchers.IO) {
+actual suspend fun captureScreenshot(region: CaptureRegion?): Result<String> = withContext(Dispatchers.IO) {
     runCatching {
         val windowManager = ScreenshotCaptureConfig.windowManager
         
@@ -34,8 +25,15 @@ actual suspend fun captureScreenshot(): Result<String> = withContext(Dispatchers
         
         try {
             val robot = Robot()
-            val screenSize = Toolkit.getDefaultToolkit().screenSize
-            val screenRect = Rectangle(screenSize)
+            
+            // Use region if provided and valid, otherwise capture full screen
+            val screenRect = if (region != null && region.isValid()) {
+                Rectangle(region.x, region.y, region.width, region.height)
+            } else {
+                val screenSize = Toolkit.getDefaultToolkit().screenSize
+                Rectangle(screenSize)
+            }
+            
             val screenshot = robot.createScreenCapture(screenRect)
             
             // Convert to PNG bytes

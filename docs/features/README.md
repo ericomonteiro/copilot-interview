@@ -65,6 +65,26 @@ Support for Brazilian exams and general assessments.
 
 ## Utility Features
 
+### [📐 Capture Region](capture-region.md)
+
+Define a specific screen area to capture instead of the entire screen.
+
+```mermaid
+flowchart LR
+    A[Select Region] --> B[Draw Rectangle]
+    B --> C[Save Coordinates]
+    C --> D[Focused Captures]
+    
+    style A fill:#00BFA6,color:#0D1B2A
+    style D fill:#00BFA6,color:#0D1B2A
+```
+
+**Benefits:**
+- Capture only the relevant content
+- Faster AI processing with smaller images
+- Avoid capturing sensitive information
+- Works with all analysis modes
+
 ### [🔒 Stealth Mode](stealth-mode.md)
 
 Hide the application from screen capture and recording software.
