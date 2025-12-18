@@ -49,7 +49,6 @@ class ScreenshotAnalysisViewModel(
     
     fun selectLanguage(language: String) {
         _state.value = _state.value.copy(selectedLanguage = language)
-        analyzeCodingChallenge()
     }
     
     fun retry() {
