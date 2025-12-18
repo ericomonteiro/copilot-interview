@@ -1,0 +1,18 @@
+services:
+  windows-builder:
+    build:
+      context: .
+      dockerfile: docker/windows/Dockerfile
+    container_name: pirate-parrot-windows-builder
+    volumes:
+      # Output directory for the built installer
+      - ./build/installers/windows:/app/output
+      # Gradle cache for faster rebuilds
+      - gradle-cache:/root/.gradle
+    environment:
+      - GRADLE_OPTS=-Xmx4g -Dorg.gradle.daemon=false
+    # Increase shared memory for Wine
+    shm_size: '2gb'
+
+volumes:
+  gradle-cache:

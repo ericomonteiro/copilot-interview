@@ -1,0 +1,38 @@
+# Simpler Dockerfile for Windows installer build
+# Uses conveyor.dev approach - builds on Linux, packages for Windows
+# This is more reliable than Wine-based cross-compilation
+
+FROM eclipse-temurin:21-jdk-jammy
+
+# Install required tools
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    fakeroot \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download Windows JDK for jpackage cross-compilation
+RUN mkdir -p /opt/jdk-windows && \
+    wget -q -O /tmp/jdk-win.zip "https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_windows-x64_bin.zip" && \
+    unzip -q /tmp/jdk-win.zip -d /opt/jdk-windows && \
+    rm /tmp/jdk-win.zip
+
+ENV WINDOWS_JDK_HOME=/opt/jdk-windows/jdk-21.0.2
+
+WORKDIR /app
+
+# Copy Gradle files first for caching
+COPY gradlew gradlew
+COPY gradle gradle
+COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+
+RUN chmod +x gradlew && ./gradlew --no-daemon --version
+
+# Copy project files
+COPY composeApp composeApp
+
+# Output volume
+VOLUME /output
+
+# Build command - creates distributable package
+CMD ["./gradlew", "--no-daemon", "packageReleaseDistributionForCurrentOS", "-Pcompose.desktop.verbose=true"]

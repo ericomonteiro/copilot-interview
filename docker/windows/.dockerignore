@@ -1,0 +1,28 @@
+# Build outputs
+build/
+*/build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker/
+docker-compose*.yml
+Dockerfile*
+
+# Native builds (not needed for Windows)
+native/
+
+# Documentation
+docs/
+*.md
