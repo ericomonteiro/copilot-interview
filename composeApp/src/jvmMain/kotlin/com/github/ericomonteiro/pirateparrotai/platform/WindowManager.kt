@@ -35,6 +35,24 @@ actual class WindowManager {
      */
     fun setWindow(window: Window) {
         currentWindow = window
+        // Hide from taskbar/dock on all platforms
+        hideFromTaskbar(window)
+    }
+    
+    /**
+     * Hides the window from the taskbar (Windows) or dock (macOS).
+     * On macOS, this is handled via LSUIElement in Info.plist for native builds.
+     * On Windows, we set the window type to UTILITY.
+     */
+    private fun hideFromTaskbar(window: Window) {
+        if (isWindows()) {
+            try {
+                window.type = Window.Type.UTILITY
+                AppLogger.info("WindowManager: Window hidden from taskbar (UTILITY type)")
+            } catch (e: Exception) {
+                AppLogger.error("WindowManager: Failed to hide from taskbar: ${e.message}", e)
+            }
+        }
     }
     
     /**

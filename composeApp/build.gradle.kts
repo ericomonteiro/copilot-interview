@@ -101,6 +101,12 @@ compose.desktop {
             
             macOS {
                 iconFile.set(project.file("src/jvmMain/resources/icon-mac.icns"))
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>LSUIElement</key>
+                        <true/>
+                    """.trimIndent()
+                }
             }
             
             linux {
