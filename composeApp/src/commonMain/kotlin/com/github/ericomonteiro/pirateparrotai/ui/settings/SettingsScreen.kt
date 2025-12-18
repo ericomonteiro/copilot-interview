@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.pirateparrotai.screenshot.CaptureRegion
+import com.github.ericomonteiro.pirateparrotai.i18n.AppLanguage
+import com.github.ericomonteiro.pirateparrotai.i18n.strings
 import com.github.ericomonteiro.pirateparrotai.ui.theme.AppColors
 import com.github.ericomonteiro.pirateparrotai.util.ClipboardUtils
 import org.koin.compose.koinInject
@@ -37,6 +39,7 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val uriHandler = LocalUriHandler.current
+    val strings = strings()
     
     // Update hide from capture in parent when it changes
     LaunchedEffect(state.hideFromCapture) {
@@ -61,7 +64,7 @@ fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Settings",
+                    strings.settings,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -73,21 +76,72 @@ fun SettingsScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
+        // App Language Section
+        SettingsSectionHeader(icon = Icons.Outlined.Translate, title = strings.settingsAppLanguage)
+        Spacer(modifier = Modifier.height(8.dp))
+        var appLanguageExpanded by remember { mutableStateOf(false) }
+        Box {
+            OutlinedButton(
+                onClick = { appLanguageExpanded = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(state.appLanguage.nativeName)
+                    Icon(Icons.Default.ArrowDropDown, null)
+                }
+            }
+            DropdownMenu(
+                expanded = appLanguageExpanded,
+                onDismissRequest = { appLanguageExpanded = false }
+            ) {
+                AppLanguage.entries.forEach { lang ->
+                    DropdownMenuItem(
+                        text = { 
+                            Column {
+                                Text(lang.nativeName)
+                                Text(
+                                    lang.displayName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        onClick = {
+                            viewModel.setAppLanguage(lang)
+                            appLanguageExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Text(
+            strings.settingsAppLanguageHint,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
         // API Key Section
-        SettingsSectionHeader(icon = Icons.Outlined.Key, title = "Gemini API Key")
+        SettingsSectionHeader(icon = Icons.Outlined.Key, title = strings.settingsGeminiApiKey)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = state.apiKey,
             onValueChange = { viewModel.setApiKey(it) },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("sk-...") },
+            placeholder = { Text(strings.settingsApiKeyPlaceholder) },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             shape = RoundedCornerShape(12.dp)
         )
         val apiKeyUrl = "https://aistudio.google.com/app/apikey"
         val apiKeyAnnotatedString = buildAnnotatedString {
-            append("Get your API key from ")
+            append(strings.settingsGetApiKey + " ")
             pushStringAnnotation(tag = "URL", annotation = apiKeyUrl)
             withStyle(style = SpanStyle(
                 color = MaterialTheme.colorScheme.primary,
@@ -119,14 +173,14 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SettingsSectionHeader(icon = Icons.Outlined.SmartToy, title = "AI Model")
+            SettingsSectionHeader(icon = Icons.Outlined.SmartToy, title = strings.settingsAiModel)
             FilledTonalButton(
                 onClick = { viewModel.loadAvailableModels() },
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Reload")
+                Text(strings.reload)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -186,7 +240,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Default Language Selection
-        SettingsSectionHeader(icon = Icons.Outlined.Language, title = "Default Language")
+        SettingsSectionHeader(icon = Icons.Outlined.Language, title = strings.settingsDefaultLanguage)
         Spacer(modifier = Modifier.height(8.dp))
         var languageExpanded by remember { mutableStateOf(false) }
         Box {
@@ -219,7 +273,7 @@ fun SettingsScreen(
             }
         }
         Text(
-            "This language will be pre-selected when analyzing challenges",
+            strings.settingsDefaultLanguageHint,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp)
@@ -228,7 +282,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Stealth Mode
-        SettingsSectionHeader(icon = Icons.Outlined.VisibilityOff, title = "Stealth Features")
+        SettingsSectionHeader(icon = Icons.Outlined.VisibilityOff, title = strings.settingsStealthFeatures)
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -236,9 +290,9 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Hide from Screen Capture")
+                Text(strings.settingsHideFromCapture)
                 Text(
-                    "Makes window invisible in Zoom, Meet, Teams",
+                    strings.settingsHideFromCaptureDesc,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -252,7 +306,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Capture Region Section
-        SettingsSectionHeader(icon = Icons.Outlined.Crop, title = "Capture Region")
+        SettingsSectionHeader(icon = Icons.Outlined.Crop, title = strings.settingsCaptureRegion)
         Spacer(modifier = Modifier.height(8.dp))
         
         Row(
@@ -261,12 +315,12 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Use Custom Region")
+                Text(strings.settingsUseCustomRegion)
                 Text(
                     if (state.captureRegionEnabled && state.captureRegion != null) {
-                        "Region: ${state.captureRegion!!.width} x ${state.captureRegion!!.height} at (${state.captureRegion!!.x}, ${state.captureRegion!!.y})"
+                        String.format(strings.settingsRegionInfo, state.captureRegion!!.width, state.captureRegion!!.height, state.captureRegion!!.x, state.captureRegion!!.y)
                     } else {
-                        "Capture entire screen"
+                        strings.settingsCaptureEntireScreen
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -297,7 +351,7 @@ fun SettingsScreen(
             ) {
                 Icon(Icons.Outlined.SelectAll, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Select Region")
+                Text(strings.settingsSelectRegion)
             }
             
             if (state.captureRegionEnabled) {
@@ -308,13 +362,13 @@ fun SettingsScreen(
                 ) {
                     Icon(Icons.Outlined.Clear, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Clear")
+                    Text(strings.clear)
                 }
             }
         }
         
         Text(
-            "Define a specific screen area to capture instead of the entire screen",
+            strings.settingsDefineRegionHint,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp)
@@ -323,7 +377,7 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Troubleshooting
-        SettingsSectionHeader(icon = Icons.Outlined.BugReport, title = "Troubleshooting")
+        SettingsSectionHeader(icon = Icons.Outlined.BugReport, title = strings.settingsTroubleshooting)
         Spacer(modifier = Modifier.height(8.dp))
         FilledTonalButton(
             onClick = onHistoryClick,
@@ -332,10 +386,10 @@ fun SettingsScreen(
         ) {
             Icon(Icons.Outlined.History, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Screenshot History")
+            Text(strings.settingsScreenshotHistory)
         }
         Text(
-            "View captured screenshots and analysis results for debugging",
+            strings.settingsScreenshotHistoryDesc,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp)
@@ -354,7 +408,7 @@ fun SettingsScreen(
         ) {
             Icon(Icons.Outlined.NetworkCheck, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Test API Connection", fontWeight = FontWeight.Bold)
+            Text(strings.settingsTestApiConnection, fontWeight = FontWeight.Bold)
         }
         
         // Show test result
@@ -379,7 +433,7 @@ fun SettingsScreen(
                         onClick = { ClipboardUtils.copyToClipboard(result) },
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Copy Result")
+                        Text(strings.copy)
                     }
                 }
             }
@@ -404,7 +458,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Tips",
+                        strings.tips,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.Primary
@@ -412,11 +466,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Global Hotkeys (work even when app is not focused):\n" +
-                    "• Cmd+Shift+Opt+S - Capture screenshot & analyze\n" +
-                    "• Cmd+Shift+Opt+B - Toggle stealth mode\n\n" +
-                    "• Solution code is auto-copied to clipboard!\n" +
-                    "• Gemini is completely FREE (no credit card needed)",
+                    strings.settingsTipsContent,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

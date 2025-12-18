@@ -18,6 +18,9 @@ object SettingsKeys {
     const val WINDOW_X = "window_x"
     const val WINDOW_Y = "window_y"
     
+    // App language (i18n)
+    const val APP_LANGUAGE = "app_language"
+    
     // Capture region
     const val CAPTURE_REGION_ENABLED = "capture_region_enabled"
     const val CAPTURE_REGION_X = "capture_region_x"

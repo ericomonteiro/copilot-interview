@@ -7,6 +7,7 @@ import com.github.ericomonteiro.pirateparrotai.ai.HttpClientFactory
 import com.github.ericomonteiro.pirateparrotai.data.repository.SettingsRepository
 import com.github.ericomonteiro.pirateparrotai.util.AppLogger
 import com.github.ericomonteiro.pirateparrotai.screenshot.CaptureRegion
+import com.github.ericomonteiro.pirateparrotai.i18n.AppLanguage
 import com.github.ericomonteiro.pirateparrotai.util.SettingsKeys
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -29,6 +30,14 @@ class SettingsViewModel(
             val selectedModel = repository.getSetting(SettingsKeys.SELECTED_MODEL) ?: "gemini-2.5-flash"
             val defaultLanguage = repository.getSetting(SettingsKeys.DEFAULT_LANGUAGE) ?: "Kotlin"
             
+            // Load app language (i18n)
+            val savedAppLanguage = repository.getSetting(SettingsKeys.APP_LANGUAGE)
+            val appLanguage = if (savedAppLanguage != null) {
+                AppLanguage.fromCode(savedAppLanguage)
+            } else {
+                AppLanguage.getSystemLanguage()
+            }
+            
             // Load capture region settings
             val captureRegionEnabled = repository.getSetting(SettingsKeys.CAPTURE_REGION_ENABLED)?.toBoolean() ?: false
             val captureRegion = if (captureRegionEnabled) {
@@ -46,6 +55,7 @@ class SettingsViewModel(
                     hideFromCapture = hideFromCapture,
                     selectedModel = selectedModel,
                     defaultLanguage = defaultLanguage,
+                    appLanguage = appLanguage,
                     captureRegionEnabled = captureRegionEnabled,
                     captureRegion = captureRegion
                 )
@@ -112,6 +122,13 @@ class SettingsViewModel(
         _state.update { it.copy(captureRegion = null, captureRegionEnabled = false) }
         viewModelScope.launch {
             repository.setSetting(SettingsKeys.CAPTURE_REGION_ENABLED, "false")
+        }
+    }
+    
+    fun setAppLanguage(language: AppLanguage) {
+        _state.update { it.copy(appLanguage = language) }
+        viewModelScope.launch {
+            repository.setSetting(SettingsKeys.APP_LANGUAGE, language.code)
         }
     }
     
@@ -239,6 +256,7 @@ data class SettingsState(
     val availableModels: List<GeminiModel> = getDefaultModels(),
     val isLoadingModels: Boolean = false,
     val defaultLanguage: String = "Kotlin",
+    val appLanguage: AppLanguage = AppLanguage.getSystemLanguage(),
     val captureRegionEnabled: Boolean = false,
     val captureRegion: CaptureRegion? = null
 )

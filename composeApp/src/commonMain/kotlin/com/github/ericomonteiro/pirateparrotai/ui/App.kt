@@ -14,6 +14,7 @@ import com.github.ericomonteiro.pirateparrotai.ui.screenshot.ScreenshotAnalysisS
 import com.github.ericomonteiro.pirateparrotai.ui.theme.PirateParrotDarkColorScheme
 import com.github.ericomonteiro.pirateparrotai.screenshot.showRegionSelector
 import com.github.ericomonteiro.pirateparrotai.screenshot.ScreenshotCaptureConfig
+import com.github.ericomonteiro.pirateparrotai.i18n.ProvideStrings
 import org.koin.compose.koinInject
 
 enum class Screen {
@@ -28,6 +29,10 @@ fun App(
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     var autoCapture by remember { mutableStateOf(false) }
     
+    // Get settings for language
+    val settingsViewModel: SettingsViewModel = koinInject()
+    val settingsState by settingsViewModel.state.collectAsState()
+    
     // Handle screenshot request from keyboard shortcut - respects current screen context
     LaunchedEffect(screenshotTrigger) {
         if (screenshotTrigger > 0) {
@@ -40,14 +45,15 @@ fun App(
         }
     }
     
-    MaterialTheme(
-        colorScheme = PirateParrotDarkColorScheme
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+    ProvideStrings(language = settingsState.appLanguage) {
+        MaterialTheme(
+            colorScheme = PirateParrotDarkColorScheme
         ) {
-            when (currentScreen) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                when (currentScreen) {
                 Screen.HOME -> HomeScreen(
                     onCodeChallengeClick = {
                         currentScreen = Screen.SCREENSHOT_ANALYSIS
@@ -134,11 +140,12 @@ fun App(
                         viewModel = settingsViewModel
                     )
                 }
-                Screen.HISTORY -> ScreenshotHistoryScreen(
-                    onBackClick = {
-                        currentScreen = Screen.SETTINGS
-                    }
-                )
+                    Screen.HISTORY -> ScreenshotHistoryScreen(
+                        onBackClick = {
+                            currentScreen = Screen.SETTINGS
+                        }
+                    )
+                }
             }
         }
     }

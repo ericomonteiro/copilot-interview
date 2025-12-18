@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.ericomonteiro.pirateparrotai.ui.theme.AppColors
+import com.github.ericomonteiro.pirateparrotai.i18n.strings
 
 @Composable
 fun HomeScreen(
@@ -27,6 +28,7 @@ fun HomeScreen(
     onSettingsClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val strings = strings()
     
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Toolbar
@@ -46,7 +48,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Pirate-Parrot",
+                    strings.appName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.Primary
@@ -55,16 +57,16 @@ fun HomeScreen(
             
             Row {
                 IconButton(onClick = onCodeChallengeClick) {
-                    Icon(Icons.Default.Code, "Code Challenge")
+                    Icon(Icons.Default.Code, strings.homeCodeChallenge)
                 }
                 IconButton(onClick = onCertificationClick) {
-                    Icon(Icons.Default.School, "AWS Certification")
+                    Icon(Icons.Default.School, strings.homeCertification)
                 }
                 IconButton(onClick = onGenericExamClick) {
-                    Icon(Icons.Default.Quiz, "Generic Exam")
+                    Icon(Icons.Default.Quiz, strings.homeGenericExam)
                 }
                 IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Default.Settings, "Settings")
+                    Icon(Icons.Default.Settings, strings.settings)
                 }
             }
         }
@@ -105,14 +107,14 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     Text(
-                        "Pirate-Parrot",
+                        strings.appName,
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.Primary
                     )
                     
                     Text(
-                        "Your AI-powered study companion",
+                        strings.homeYourAiCompanion,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -124,19 +126,8 @@ fun HomeScreen(
             // What is section
             SectionCard(
                 icon = Icons.Outlined.Info,
-                title = "What is Pirate-Parrot?",
-                content = """
-                    Pirate-Parrot is a desktop application designed to help you during coding interviews and certification exams.
-                    
-                    It captures your screen, analyzes the content using Google's Gemini AI, and provides:
-                    
-                    • Code solutions with explanations for coding challenges
-                    • Correct answers with detailed explanations for certification questions
-                    • Time and space complexity analysis
-                    • Exam tips and related services
-                    
-                    The app runs in "stealth mode" - it's invisible to screen sharing and recording software.
-                """.trimIndent()
+                title = strings.homeWhatIsTitle,
+                content = strings.homeWhatIsContent
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -144,25 +135,8 @@ fun HomeScreen(
             // Configuration section
             SectionCard(
                 icon = Icons.Outlined.Settings,
-                title = "What You Need to Configure",
-                content = """
-                    Before using the app, you need to set up:
-                    
-                    1. Gemini API Key (Required)
-                       • Go to Google AI Studio (aistudio.google.com)
-                       • Create a free API key
-                       • Paste it in Settings -> API Key
-                    
-                    2. Select AI Model (Optional)
-                       • Default: gemini-2.5-flash (recommended)
-                       • For complex problems: gemini-2.5-pro
-                    
-                    3. Default Language (Optional)
-                       • Choose your preferred programming language
-                    
-                    4. Stealth Mode (Enabled by default)
-                       • Hides app from screen capture
-                """.trimIndent(),
+                title = strings.homeConfigTitle,
+                content = strings.homeConfigContent,
                 actionButton = {
                     Button(
                         onClick = onSettingsClick,
@@ -170,7 +144,7 @@ fun HomeScreen(
                     ) {
                         Icon(Icons.Default.Settings, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Open Settings")
+                        Text(strings.homeOpenSettings)
                     }
                 }
             )
@@ -180,36 +154,15 @@ fun HomeScreen(
             // How to use section
             SectionCard(
                 icon = Icons.Outlined.PlayArrow,
-                title = "How to Use",
-                content = """
-                    The app has two main modes:
-                    
-                    Code Challenges
-                    • Navigate to a coding problem (LeetCode, HackerRank, etc.)
-                    • Press Cmd+Shift+Opt+S or click "Capture"
-                    • The AI will analyze and provide a solution
-                    
-                    AWS Certification
-                    • Open your certification exam question
-                    • Select the certification type
-                    • Press Cmd+Shift+Opt+S or click "Capture"
-                    • Get the correct answer with explanations
-                    
-                    Keyboard Shortcuts
-                    • Cmd+Shift+Opt+S -> Capture & Analyze
-                    • Cmd+Shift+Opt+B -> Toggle Stealth Mode
-                    
-                    Tips
-                    • Make sure the question is fully visible
-                    • Check Screenshot History for troubleshooting
-                """.trimIndent()
+                title = strings.homeHowToUseTitle,
+                content = strings.homeHowToUseContent
             )
             
             Spacer(modifier = Modifier.height(24.dp))
             
             // Quick actions
             Text(
-                "Get Started",
+                strings.homeGetStarted,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -223,8 +176,8 @@ fun HomeScreen(
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.Code,
-                    title = "Code Challenge",
-                    description = "Solve coding problems",
+                    title = strings.homeCodeChallenge,
+                    description = strings.homeCodeChallengeDesc,
                     gradientColors = listOf(AppColors.Primary, AppColors.PrimaryDark),
                     onClick = onCodeChallengeClick
                 )
@@ -232,8 +185,8 @@ fun HomeScreen(
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.School,
-                    title = "Certification",
-                    description = "AWS exam questions",
+                    title = strings.homeCertification,
+                    description = strings.homeCertificationDesc,
                     gradientColors = listOf(AppColors.Secondary, AppColors.SecondaryDark),
                     onClick = onCertificationClick
                 )
@@ -241,8 +194,8 @@ fun HomeScreen(
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.Quiz,
-                    title = "Generic Exam",
-                    description = "ENEM, Vestibular, Concursos",
+                    title = strings.homeGenericExam,
+                    description = strings.homeGenericExamDesc,
                     gradientColors = listOf(AppColors.Tertiary, AppColors.TertiaryDark),
                     onClick = onGenericExamClick
                 )
